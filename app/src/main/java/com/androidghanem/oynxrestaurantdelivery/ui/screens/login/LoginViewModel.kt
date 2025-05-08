@@ -74,7 +74,6 @@ class LoginViewModel(
         selectedLanguage?.let {
             languageRepository.setSelectedLanguage(it.code)
             LocaleHelper.setLocale(getApplication(), it.code)
-            appInstance.preferencesManager.setLanguageCode(it.code)
             getApplication<Application>().startActivity(
                 Intent.makeRestartActivityTask(
                     getApplication<Application>().packageManager.getLaunchIntentForPackage(

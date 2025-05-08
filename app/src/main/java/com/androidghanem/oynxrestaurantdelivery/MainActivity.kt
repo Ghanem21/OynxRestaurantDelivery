@@ -6,10 +6,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
+import com.androidghanem.domain.utils.LocaleHelper
 import com.androidghanem.oynxrestaurantdelivery.ui.navigation.AppNavigation
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.OynxRestaurantDeliveryTheme
-import com.androidghanem.domain.utils.LocaleHelper
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     private lateinit var appInstance: OnyxApplication
@@ -29,11 +31,10 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             appInstance.preferencesManager.languageCode.collect { newLanguageCode ->
-                runOnUiThread { 
+                withContext(Dispatchers.Main) {
                     LocaleHelper.setLocale(this@MainActivity, newLanguageCode)
-                    recreate() 
                 }
             }
         }

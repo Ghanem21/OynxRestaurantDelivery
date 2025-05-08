@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.androidghanem.domain.model.Language
 import com.androidghanem.oynxrestaurantdelivery.R
+import com.androidghanem.oynxrestaurantdelivery.ui.theme.MontserratFontFamily
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.PrimaryTeal
 
 @Composable
@@ -42,6 +43,10 @@ fun LanguageDialog(
     onLanguageSelected: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
+    if (languages.isEmpty()) {
+        return
+    }
+    
     val selectedLanguageCode = remember { 
         mutableStateOf(languages.find { it.isSelected }?.code ?: "en") 
     }
@@ -65,6 +70,7 @@ fun LanguageDialog(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     color = PrimaryTeal,
+                    fontFamily = MontserratFontFamily,
                     modifier = Modifier
                         .padding(bottom = 24.dp)
                         .align(Alignment.Start)
@@ -118,7 +124,8 @@ fun LanguageDialog(
                         text = stringResource(R.string.apply),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
-                        color = Color.White
+                        color = Color.White,
+                        fontFamily = MontserratFontFamily
                     )
                 }
             }
@@ -175,7 +182,8 @@ fun LanguageOption(
                     text = language.localizedName,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.Black
+                    color = Color.Black,
+                    fontFamily = MontserratFontFamily
                 )
                 
                 // Display English name for Arabic language and vice versa
@@ -183,13 +191,15 @@ fun LanguageOption(
                     Text(
                         text = stringResource(R.string.arabic),
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = Color.Gray,
+                        fontFamily = MontserratFontFamily
                     )
                 } else {
                     Text(
                         text = stringResource(R.string.english),
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = Color.Gray,
+                        fontFamily = MontserratFontFamily
                     )
                 }
             }
