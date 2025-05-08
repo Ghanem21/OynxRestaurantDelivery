@@ -12,3 +12,6 @@ val Pink40 = Color(0xFF7D5260)
 
 // App custom colors
 val LightBlue = Color(0xFFE9FAFF)
+val PrimaryTeal = Color(0xFF006978)
+val BackgroundGray = Color(0xFFF5F6FA)
+val TextFieldBackground = Color(0xFFF1F5FB)

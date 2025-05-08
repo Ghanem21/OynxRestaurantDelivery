@@ -4,4 +4,16 @@
     <string name="splash_logo_desc">شعار أونيكس</string>
     <string name="splash_delivery_desc">شخص التوصيل</string>
     <string name="home_title">أونيكس لتوصيل المطاعم</string>
+    <string name="welcome_back">مرحبًا بعودتك!</string>
+    <string name="login_subtitle">سجل الدخول مرة أخرى إلى حسابك</string>
+    <string name="user_id">معرف المستخدم</string>
+    <string name="password">كلمة المرور</string>
+    <string name="show_more">إظهار المزيد</string>
+    <string name="login">تسجيل الدخول</string>
+    <string name="choose_language">اختر اللغة</string>
+    <string name="apply">تطبيق</string>
+    <string name="flag_for">علم %1$s</string>
+    <string name="arabic">عربي</string>
+    <string name="english">إنجليزي</string>
+    <string name="cancel">إلغاء</string>
 </resources>

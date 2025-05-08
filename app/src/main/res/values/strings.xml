@@ -3,4 +3,16 @@
     <string name="splash_logo_desc">Onyx Logo</string>
     <string name="splash_delivery_desc">Delivery Person</string>
     <string name="home_title">Onyx Restaurant Delivery</string>
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="login_subtitle">Log back into your account</string>
+    <string name="user_id">User ID</string>
+    <string name="password">Password</string>
+    <string name="show_more">Show More</string>
+    <string name="login">Log in</string>
+    <string name="choose_language">Choose Language</string>
+    <string name="apply">Apply</string>
+    <string name="flag_for">Flag for %1$s</string>
+    <string name="arabic">Arabic</string>
+    <string name="english">English</string>
+    <string name="cancel">Cancel</string>
 </resources>
