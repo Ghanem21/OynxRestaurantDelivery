@@ -26,9 +26,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -41,14 +44,14 @@ import com.androidghanem.oynxrestaurantdelivery.ui.theme.PrimaryTeal
 fun LanguageDialog(
     languages: List<Language>,
     onLanguageSelected: (String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     if (languages.isEmpty()) {
         return
     }
-    
-    val selectedLanguageCode = remember { 
-        mutableStateOf(languages.find { it.isSelected }?.code ?: "en") 
+
+    val selectedLanguageCode = remember {
+        mutableStateOf(languages.find { it.isSelected }?.code ?: "en")
     }
 
     Dialog(onDismissRequest = onDismiss) {
@@ -75,7 +78,7 @@ fun LanguageDialog(
                         .padding(bottom = 24.dp)
                         .align(Alignment.Start)
                 )
-                
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -88,29 +91,29 @@ fun LanguageDialog(
                         LanguageOption(
                             language = arabicLanguage,
                             isSelected = selectedLanguageCode.value == "ar",
-                            onSelect = { 
+                            onSelect = {
                                 selectedLanguageCode.value = "ar"
                             },
                             modifier = Modifier.weight(1f)
                         )
                     }
-                    
+
                     // English option
                     val englishLanguage = languages.find { it.code == "en" }
                     if (englishLanguage != null) {
                         LanguageOption(
                             language = englishLanguage,
                             isSelected = selectedLanguageCode.value == "en",
-                            onSelect = { 
+                            onSelect = {
                                 selectedLanguageCode.value = "en"
                             },
                             modifier = Modifier.weight(1f)
                         )
                     }
                 }
-                
+
                 Button(
-                    onClick = { 
+                    onClick = {
                         onLanguageSelected(selectedLanguageCode.value)
                         onDismiss()
                     },
@@ -138,18 +141,21 @@ fun LanguageOption(
     language: Language,
     isSelected: Boolean,
     onSelect: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val backgroundColor = if (isSelected) Color(0xFFE6F7F9) else Color.White
     val borderColor = if (isSelected) PrimaryTeal else Color.LightGray
     val borderWidth = if (isSelected) 2.dp else 1.dp
-    
+
+    val layoutDirection = LocalLayoutDirection.current
+    val isRtl = layoutDirection == LayoutDirection.Rtl
+
     val flagRes = when (language.code) {
         "ar" -> R.drawable.arabic_flag
         "en" -> R.drawable.english_flag
         else -> R.drawable.english_flag // Default
     }
-    
+
     Box(
         modifier = modifier
             .border(
@@ -172,11 +178,15 @@ fun LanguageOption(
             Image(
                 painter = painterResource(id = flagRes),
                 contentDescription = stringResource(R.string.flag_for, language.name),
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier
+                    .size(24.dp)
+                    .graphicsLayer {
+                        scaleX = if (isRtl) -1f else 1f
+                    }
             )
-            
+
             Spacer(modifier = Modifier.width(8.dp))
-            
+
             Column {
                 Text(
                     text = language.localizedName,
@@ -185,7 +195,7 @@ fun LanguageOption(
                     color = Color.Black,
                     fontFamily = MontserratFontFamily
                 )
-                
+
                 // Display English name for Arabic language and vice versa
                 if (language.code == "ar") {
                     Text(

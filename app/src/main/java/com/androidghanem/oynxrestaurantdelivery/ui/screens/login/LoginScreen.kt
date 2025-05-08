@@ -23,13 +23,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -47,10 +50,13 @@ fun LoginScreen(
         factory = LoginViewModelFactory(
             application = LocalContext.current.applicationContext as Application
         )
-    )
+    ),
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    
+
+    val layoutDirection = LocalLayoutDirection.current
+    val isRtl = layoutDirection == LayoutDirection.Rtl
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -61,22 +67,27 @@ fun LoginScreen(
             contentDescription = "Onyx Logo",
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(top = 36.dp , start = 26.dp)
+                .padding(top = 36.dp, start = 26.dp)
                 .width(170.dp)
                 .height(75.dp),
-                    contentScale = ContentScale.FillBounds
+            contentScale = ContentScale.FillBounds
 
         )
 
 
         // Top right quarter circle
+
+
         Image(
             painter = painterResource(id = R.drawable.log_in_quarter_circle),
             contentDescription = null,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .size(127.dp),
-            contentScale = ContentScale.FillBounds
+                .size(127.dp)
+                .graphicsLayer {
+                    scaleX = if (isRtl) -1f else 1f
+                },
+            contentScale = ContentScale.FillBounds,
         )
 
         // Language icon
@@ -93,7 +104,11 @@ fun LoginScreen(
             Image(
                 painter = painterResource(id = R.drawable.ic_language),
                 contentDescription = "Change language",
-                modifier = Modifier.size(27.dp)
+                modifier = Modifier
+                    .size(27.dp)
+                    .graphicsLayer {
+                        scaleX = if (isRtl) -1f else 1f
+                    }
             )
         }
 
@@ -109,17 +124,17 @@ fun LoginScreen(
                 text = stringResource(R.string.welcome_back),
                 fontSize = 29.sp,
                 fontWeight = FontWeight.Bold,
-                color = PrimaryTeal ,
+                color = PrimaryTeal,
                 modifier = Modifier.padding(top = 40.dp)
             )
-            
+
             Text(
                 text = stringResource(R.string.login_subtitle),
                 fontSize = 12.sp,
                 color = PrimaryTeal,
                 modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
             )
-            
+
             // User ID field
             LoginTextField(
                 value = uiState.userId,
@@ -127,14 +142,14 @@ fun LoginScreen(
                 label = stringResource(R.string.user_id),
                 modifier = Modifier.padding(top = 16.dp)
             )
-            
+
             // Password field
             LoginTextField(
                 value = uiState.password,
                 onValueChange = viewModel::onPasswordChange,
                 label = stringResource(R.string.password),
-                visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None 
-                    else PasswordVisualTransformation(),
+                visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None
+                else PasswordVisualTransformation(),
                 modifier = Modifier.padding(top = 16.dp)
             )
 
@@ -152,7 +167,7 @@ fun LoginScreen(
             // Login button
             LoginButton(
                 text = stringResource(R.string.login),
-                onClick = { 
+                onClick = {
                     viewModel.login()
                     onLoginSuccess()
                 },
@@ -171,11 +186,14 @@ fun LoginScreen(
                     .height(170.dp)
                     .width(195.dp)
                     .padding(bottom = 16.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .graphicsLayer {
+                        scaleX = if (isRtl) -1f else 1f
+                    },
                 contentScale = ContentScale.Fit
             )
         }
-        
+
         // Language Dialog
         if (uiState.isLanguageDialogVisible) {
             LanguageDialog(

@@ -13,8 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.androidghanem.oynxrestaurantdelivery.R
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.LightBlue
@@ -26,19 +29,27 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
         delay(3000)
         onSplashFinished()
     }
-    
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(LightBlue),
         contentAlignment = Alignment.Center
     ) {
+        val layoutDirection = LocalLayoutDirection.current
+        val isRtl = layoutDirection == LayoutDirection.Rtl
+
         Image(
             painter = painterResource(id = R.drawable.splash_screen_bg),
             contentDescription = null,
-            modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter)
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .graphicsLayer {
+                    scaleX = if (isRtl) -1f else 1f
+                }
         )
-        
+
         Image(
             painter = painterResource(id = R.drawable.splash_screen_logo),
             contentDescription = stringResource(R.string.splash_logo_desc),
@@ -47,7 +58,7 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
                 .height(115.dp)
                 .align(Alignment.Center)
         )
-        
+
         Image(
             painter = painterResource(id = R.drawable.splash_screen_delivery),
             contentDescription = stringResource(R.string.splash_delivery_desc),
@@ -55,6 +66,9 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
                 .align(Alignment.BottomCenter)
                 .padding(horizontal = 50.dp)
                 .size(275.dp)
+                .graphicsLayer {
+                    scaleX = if (isRtl) -1f else 1f
+                }
         )
     }
 }
