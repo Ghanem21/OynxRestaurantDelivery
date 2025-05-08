@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">أونيكس لتوصيل المطاعم</string>
+    <string name="splash_logo_desc">شعار أونيكس</string>
+    <string name="splash_delivery_desc">شخص التوصيل</string>
+    <string name="home_title">أونيكس لتوصيل المطاعم</string>
+</resources>
