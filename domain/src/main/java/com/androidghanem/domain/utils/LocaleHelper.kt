@@ -1,4 +1,4 @@
-package com.androidghanem.oynxrestaurantdelivery.utils
+package com.androidghanem.domain.utils
 
 import android.content.Context
 import android.content.res.Configuration

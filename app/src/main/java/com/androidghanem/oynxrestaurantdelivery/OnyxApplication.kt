@@ -5,7 +5,7 @@ import android.content.Context
 import com.androidghanem.data.preferences.AppPreferencesManager
 import com.androidghanem.data.repository.LanguageRepositoryImpl
 import com.androidghanem.domain.repository.LanguageRepository
-import com.androidghanem.oynxrestaurantdelivery.utils.LocaleHelper
+import com.androidghanem.domain.utils.LocaleHelper
 
 class OnyxApplication : Application() {
     

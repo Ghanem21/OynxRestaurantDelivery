@@ -8,7 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
 import com.androidghanem.oynxrestaurantdelivery.ui.navigation.AppNavigation
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.OynxRestaurantDeliveryTheme
-import com.androidghanem.oynxrestaurantdelivery.utils.LocaleHelper
+import com.androidghanem.domain.utils.LocaleHelper
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {

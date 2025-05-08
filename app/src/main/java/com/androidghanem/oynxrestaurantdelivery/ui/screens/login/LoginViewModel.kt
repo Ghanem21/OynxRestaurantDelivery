@@ -6,8 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.androidghanem.domain.model.Language
 import com.androidghanem.domain.repository.LanguageRepository
+import com.androidghanem.domain.utils.LocaleHelper
 import com.androidghanem.oynxrestaurantdelivery.OnyxApplication
-import com.androidghanem.oynxrestaurantdelivery.utils.LocaleHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
