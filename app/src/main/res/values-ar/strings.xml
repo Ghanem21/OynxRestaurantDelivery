@@ -14,6 +14,14 @@
     <string name="apply">تطبيق</string>
     <string name="flag_for">علم %1$s</string>
     <string name="arabic">عربي</string>
-    <string name="english">إنجليزي</string>
+    <string name="english">الإنجليزية</string>
     <string name="cancel">إلغاء</string>
+    <string name="tab_new">جديد</string>
+    <string name="tab_others">أخرى</string>
+    <string name="empty_orders_title">لا توجد طلبات حتى الآن</string>
+    <string name="empty_orders_message">ليس لديك أي طلبات في سجلك.</string>
+    <string name="label_status">الحالة</string>
+    <string name="label_total_price">السعر الكلي</string>
+    <string name="label_date">التاريخ</string>
+    <string name="order_details_button">تفاصيل\nالطلب</string>
 </resources>

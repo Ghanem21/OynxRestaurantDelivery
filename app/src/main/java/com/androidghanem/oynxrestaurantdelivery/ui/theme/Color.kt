@@ -15,3 +15,9 @@ val LightBlue = Color(0xFFE9FAFF)
 val PrimaryTeal = Color(0xFF006978)
 val BackgroundGray = Color(0xFFF5F6FA)
 val TextFieldBackground = Color(0xFFF1F5FB)
+
+// Home screen colors
+val HeaderRed = Color(0xFFE53935)
+val StatusGreen = Color(0xFF4CAF50)
+val StatusGray = Color(0xFF9E9E9E)
+val StatusRed = Color(0xFFE53935)

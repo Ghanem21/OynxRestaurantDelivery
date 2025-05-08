@@ -15,4 +15,12 @@
     <string name="arabic">Arabic</string>
     <string name="english">English</string>
     <string name="cancel">Cancel</string>
+    <string name="tab_new">New</string>
+    <string name="tab_others">Others</string>
+    <string name="empty_orders_title">No orders yet</string>
+    <string name="empty_orders_message">You don\'t have any orders in your history.</string>
+    <string name="label_status">Status</string>
+    <string name="label_total_price">Total price</string>
+    <string name="label_date">Date</string>
+    <string name="order_details_button">Order\nDetails</string>
 </resources>
