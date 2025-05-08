@@ -1,4 +1,4 @@
-package com.androidghanem.oynxrestaurantdelivery.data.preferences
+package com.androidghanem.data.preferences
 
 import android.content.Context
 import android.content.SharedPreferences

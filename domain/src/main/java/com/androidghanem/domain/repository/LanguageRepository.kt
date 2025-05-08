@@ -1,6 +1,6 @@
-package com.androidghanem.oynxrestaurantdelivery.domain.repository
+package com.androidghanem.domain.repository
 
-import com.androidghanem.oynxrestaurantdelivery.domain.model.Language
+import com.androidghanem.domain.model.Language
 
 interface LanguageRepository {
     fun getAvailableLanguages(onResult: (List<Language>) -> Unit)

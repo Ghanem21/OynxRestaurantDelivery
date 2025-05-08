@@ -2,12 +2,18 @@ package com.androidghanem.oynxrestaurantdelivery
 
 import android.app.Application
 import android.content.Context
-import com.androidghanem.oynxrestaurantdelivery.data.preferences.AppPreferencesManager
+import com.androidghanem.data.preferences.AppPreferencesManager
+import com.androidghanem.data.repository.LanguageRepositoryImpl
+import com.androidghanem.domain.repository.LanguageRepository
 import com.androidghanem.oynxrestaurantdelivery.utils.LocaleHelper
 
 class OnyxApplication : Application() {
     
-    private lateinit var preferencesManager: AppPreferencesManager
+    lateinit var preferencesManager: AppPreferencesManager
+        private set
+    
+    lateinit var languageRepository: LanguageRepository
+        private set
     
     override fun attachBaseContext(base: Context) {
         preferencesManager = AppPreferencesManager(base)
@@ -17,6 +23,10 @@ class OnyxApplication : Application() {
     
     override fun onCreate() {
         super.onCreate()
-        // Initialize any other app-wide configurations here
+        
+        // Initialize repositories
+        languageRepository = LanguageRepositoryImpl(preferencesManager)
     }
+    
+
 }

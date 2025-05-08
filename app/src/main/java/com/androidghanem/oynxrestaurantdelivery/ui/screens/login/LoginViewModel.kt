@@ -4,10 +4,9 @@ import android.app.Application
 import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.androidghanem.oynxrestaurantdelivery.data.preferences.AppPreferencesManager
-import com.androidghanem.oynxrestaurantdelivery.data.repository.LanguageRepositoryImpl
-import com.androidghanem.oynxrestaurantdelivery.domain.model.Language
-import com.androidghanem.oynxrestaurantdelivery.domain.repository.LanguageRepository
+import com.androidghanem.domain.model.Language
+import com.androidghanem.domain.repository.LanguageRepository
+import com.androidghanem.oynxrestaurantdelivery.OnyxApplication
 import com.androidghanem.oynxrestaurantdelivery.utils.LocaleHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,8 +28,8 @@ class LoginViewModel(
     application: Application
 ) : AndroidViewModel(application) {
     
-    private val preferencesManager = AppPreferencesManager(application)
-    private val languageRepository: LanguageRepository = LanguageRepositoryImpl(preferencesManager)
+    private val appInstance: OnyxApplication = application as OnyxApplication
+    private val languageRepository: LanguageRepository = appInstance.languageRepository
     
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -75,7 +74,7 @@ class LoginViewModel(
         selectedLanguage?.let {
             languageRepository.setSelectedLanguage(it.code)
             LocaleHelper.setLocale(getApplication(), it.code)
-            preferencesManager.setLanguageCode(it.code)
+            appInstance.preferencesManager.setLanguageCode(it.code)
             getApplication<Application>().startActivity(
                 Intent.makeRestartActivityTask(
                     getApplication<Application>().packageManager.getLaunchIntentForPackage(

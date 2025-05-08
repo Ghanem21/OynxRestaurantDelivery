@@ -6,18 +6,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
-import com.androidghanem.oynxrestaurantdelivery.data.preferences.AppPreferencesManager
 import com.androidghanem.oynxrestaurantdelivery.ui.navigation.AppNavigation
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.OynxRestaurantDeliveryTheme
 import com.androidghanem.oynxrestaurantdelivery.utils.LocaleHelper
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private lateinit var preferencesManager: AppPreferencesManager
+    private lateinit var appInstance: OnyxApplication
 
     override fun attachBaseContext(newBase: Context) {
-        preferencesManager = AppPreferencesManager(newBase)
-        val languageCode = preferencesManager.getLanguageCode()
+        appInstance = newBase.applicationContext as OnyxApplication
+        val languageCode = appInstance.preferencesManager.getLanguageCode()
         super.attachBaseContext(LocaleHelper.setLocale(newBase, languageCode))
     }
 
@@ -31,7 +30,7 @@ class MainActivity : ComponentActivity() {
         }
 
         lifecycleScope.launch {
-            preferencesManager.languageCode.collect { newLanguageCode ->
+            appInstance.preferencesManager.languageCode.collect { newLanguageCode ->
                 runOnUiThread { 
                     LocaleHelper.setLocale(this@MainActivity, newLanguageCode)
                     recreate() 

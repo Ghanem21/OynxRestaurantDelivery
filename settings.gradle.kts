@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Oynx Restaurant Delivery"
 include(":app")
- 
+include(":data")
+include(":domain")

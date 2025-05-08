@@ -3,6 +3,7 @@ package com.androidghanem.oynxrestaurantdelivery.ui.screens.login
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.androidghanem.oynxrestaurantdelivery.OnyxApplication
 
 class LoginViewModelFactory(
     private val application: Application

@@ -1,4 +1,4 @@
-package com.androidghanem.oynxrestaurantdelivery.domain.model
+package com.androidghanem.domain.model
 
 data class Language(
     val code: String,

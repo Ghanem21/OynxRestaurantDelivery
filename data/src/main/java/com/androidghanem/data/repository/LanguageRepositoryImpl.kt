@@ -1,8 +1,8 @@
-package com.androidghanem.oynxrestaurantdelivery.data.repository
+package com.androidghanem.data.repository
 
-import com.androidghanem.oynxrestaurantdelivery.data.preferences.AppPreferencesManager
-import com.androidghanem.oynxrestaurantdelivery.domain.model.Language
-import com.androidghanem.oynxrestaurantdelivery.domain.repository.LanguageRepository
+import com.androidghanem.data.preferences.AppPreferencesManager
+import com.androidghanem.domain.model.Language
+import com.androidghanem.domain.repository.LanguageRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

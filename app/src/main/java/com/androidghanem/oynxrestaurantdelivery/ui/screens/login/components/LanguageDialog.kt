@@ -32,8 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.androidghanem.domain.model.Language
 import com.androidghanem.oynxrestaurantdelivery.R
-import com.androidghanem.oynxrestaurantdelivery.domain.model.Language
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.PrimaryTeal
 
 @Composable
