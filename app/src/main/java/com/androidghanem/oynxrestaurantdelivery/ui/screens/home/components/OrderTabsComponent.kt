@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,7 +29,7 @@ fun OrderTabs(selectedTab: OrderTab, onTabSelected: (OrderTab) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(start = 64.dp, end = 64.dp, top = 16.dp, bottom =12.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -37,14 +38,14 @@ fun OrderTabs(selectedTab: OrderTab, onTabSelected: (OrderTab) -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             OrderTabItem(
-                title = OrderTab.NEW.getDisplayText(),
+                title = OrderTab.NEW.getDisplayText(LocalContext.current),
                 isSelected = selectedTab == OrderTab.NEW,
                 onClick = { onTabSelected(OrderTab.NEW) },
                 modifier = Modifier.weight(1f)
             )
             
             OrderTabItem(
-                title = OrderTab.OTHERS.getDisplayText(),
+                title = OrderTab.OTHERS.getDisplayText(LocalContext.current),
                 isSelected = selectedTab == OrderTab.OTHERS,
                 onClick = { onTabSelected(OrderTab.OTHERS) },
                 modifier = Modifier.weight(1f)

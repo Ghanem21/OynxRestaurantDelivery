@@ -13,6 +13,7 @@ import com.androidghanem.domain.repository.DeliveryRepository
 import com.androidghanem.domain.repository.LanguageRepository
 import com.androidghanem.domain.utils.LocaleHelper
 import com.androidghanem.oynxrestaurantdelivery.OnyxApplication
+import com.androidghanem.oynxrestaurantdelivery.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,10 +23,17 @@ import kotlinx.coroutines.launch
 enum class OrderTab {
     NEW, OTHERS;
     
-    fun getDisplayText(): String {
+    fun getDisplayText(context: android.content.Context): String {
         return when (this) {
-            NEW -> "New"
-            OTHERS -> "Orders"
+            NEW -> context.getString(R.string.tab_new)
+            OTHERS -> context.getString(R.string.tab_others)
+        }
+    }
+    
+    fun getStringResourceId(): Int {
+        return when (this) {
+            NEW -> R.string.tab_new
+            OTHERS -> R.string.tab_others
         }
     }
 }
@@ -64,6 +72,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     // Driver ID for API calls
     private var driverId: String = ""
+    
+    // Flag to check if current language is Arabic
+    private val _isArabic = MutableStateFlow(false)
+    val isArabic: StateFlow<Boolean> = _isArabic.asStateFlow()
 
     init {
         fetchOrders()
@@ -79,6 +91,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
         languageRepository.getSelectedLanguage { language ->
             _uiState.update { it.copy(selectedLanguage = language) }
+            _isArabic.value = language?.code == "ar"
         }
     }
 
@@ -131,6 +144,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         selectedLanguage?.let {
             languageRepository.setSelectedLanguage(it.code)
             LocaleHelper.setLocale(getApplication(), it.code)
+            _isArabic.value = it.code == "ar"
             getApplication<Application>().startActivity(
                 Intent.makeRestartActivityTask(
                     getApplication<Application>().packageManager.getLaunchIntentForPackage(
@@ -148,6 +162,21 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             // Show loading when switching tabs
             _isLoading.value = true
             fetchOrders()
+        }
+    }
+
+    fun getTabText(tab: OrderTab): String {
+        return tab.getDisplayText(getApplication())
+    }
+
+    fun getOrderStatusText(status: OrderStatus): String {
+        val context = getApplication<Application>()
+        return when (status) {
+            OrderStatus.NEW -> context.getString(R.string.status_new)
+            OrderStatus.DELIVERING -> context.getString(R.string.status_delivering)
+            OrderStatus.DELIVERED -> context.getString(R.string.status_delivered)
+            OrderStatus.PARTIAL_RETURN -> context.getString(R.string.status_partial_return)
+            OrderStatus.RETURNED -> context.getString(R.string.status_returned)
         }
     }
 

@@ -23,4 +23,16 @@
     <string name="label_total_price">Total price</string>
     <string name="label_date">Date</string>
     <string name="order_details_button">Order\nDetails</string>
+    <!-- Order status strings -->
+    <string name="status_new">New</string>
+    <string name="status_delivering">Delivering</string>
+    <string name="status_delivered">Delivered</string>
+    <string name="status_partial_return">Partial Return</string>
+    <string name="status_returned">Returned</string>
+    <!-- Short status names -->
+    <string name="status_short_new">New</string>
+    <string name="status_short_delivering">In\nDelivery</string>
+    <string name="status_short_delivered">Delivered</string>
+    <string name="status_short_partial_return">Partial\nReturn</string>
+    <string name="status_short_returned">Returned</string>
 </resources>

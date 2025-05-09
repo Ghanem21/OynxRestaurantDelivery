@@ -24,4 +24,15 @@
     <string name="label_total_price">السعر الكلي</string>
     <string name="label_date">التاريخ</string>
     <string name="order_details_button">تفاصيل\nالطلب</string>
+    <!-- Order status strings -->
+    <string name="status_new">جديد</string>
+    <string name="status_delivering">جاري التوصيل</string>
+    <string name="status_delivered">تم التوصيل</string>
+    <string name="status_partial_return">إرجاع جزئي</string>
+    <string name="status_returned">تم الإرجاع</string>
+    <string name="status_short_new">جديد</string>
+    <string name="status_short_delivering">قيد\nالتوصيل</string>
+    <string name="status_short_delivered">تم\nالتوصيل</string>
+    <string name="status_short_partial_return">إرجاع\nجزئي</string>
+    <string name="status_short_returned">تم\nالإرجاع</string>
 </resources>
