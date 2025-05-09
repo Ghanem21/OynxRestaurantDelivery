@@ -59,9 +59,9 @@ fun HomeTopBar(
                     .padding(vertical = 27.dp, horizontal = 16.dp)
                     .weight(1f)
             ) {
-                val nameParts = name.split(" ", limit = 2)
-                val firstName = nameParts.getOrNull(0) ?: ""
-                val lastName = nameParts.getOrNull(1) ?: ""
+                val nameParts = name.split(" ")
+                val firstName = nameParts.firstOrNull() ?: ""
+                val lastName = if (nameParts.size > 1) nameParts.last() else ""
 
                 Text(
                     text = firstName,

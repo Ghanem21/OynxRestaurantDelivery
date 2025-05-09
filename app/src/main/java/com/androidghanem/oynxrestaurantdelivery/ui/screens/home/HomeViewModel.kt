@@ -30,6 +30,7 @@ data class HomeUiState(
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val appInstance: OnyxApplication = application as OnyxApplication
     private val languageRepository: LanguageRepository = appInstance.languageRepository
+    private val sessionManager = appInstance.sessionManager
 
     // Tab state
     private val _orderTabState = MutableStateFlow(OrderTab.NEW)
@@ -47,6 +48,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
+    // Driver info state
+    private val _driverName = MutableStateFlow("")
+    val driverName: StateFlow<String> = _driverName.asStateFlow()
 
     private val newOrders = listOf(
         Order("1569987", OrderStatus.NEW, "400 LE", "1/1/2020"),
@@ -68,6 +72,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     init {
         fetchOrders()
         loadLanguages()
+        loadDriverInfo()
     }
 
     private fun loadLanguages() {
@@ -77,6 +82,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
         languageRepository.getSelectedLanguage { language ->
             _uiState.update { it.copy(selectedLanguage = language) }
+        }
+    }
+
+    private fun loadDriverInfo() {
+        viewModelScope.launch {
+            sessionManager.currentDriverInfo.collect { driverInfo ->
+                _driverName.value = driverInfo?.name ?: ""
+            }
         }
     }
 

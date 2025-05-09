@@ -25,7 +25,6 @@ class MainActivity : ComponentActivity() {
     
     override fun onResume() {
         super.onResume()
-        // Reset the session timer when activity resumes
         appInstance.resetSessionTimer()
     }
 
@@ -33,7 +32,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
-        // Set up touch event listener for the whole window to track user activity
         window.decorView.setOnTouchListener { _, event -> 
             if (event.action == MotionEvent.ACTION_DOWN || event.action == MotionEvent.ACTION_MOVE) {
                 appInstance.resetSessionTimer()

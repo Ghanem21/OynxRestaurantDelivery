@@ -35,12 +35,13 @@ fun HomeScreen(
     val orders by homeViewModel.orders.collectAsState()
     val isLoading by homeViewModel.isLoading.collectAsState()
     val uiState by homeViewModel.uiState.collectAsState()
-    
+    val driverName by homeViewModel.driverName.collectAsState()
+
     Scaffold(
         containerColor = BackgroundGray,
         topBar = { 
             HomeTopBar(
-                name = "Ahmed Othman",
+                name = driverName,
                 onLanguageClick = { homeViewModel.toggleLanguageDialog() }
             )
         }

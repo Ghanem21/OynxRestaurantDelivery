@@ -16,7 +16,6 @@ class AppPreferencesManager(context: Context) {
     
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
     
-    // StateFlow to notify about language changes
     private val _languageCodeFlow = MutableStateFlow(getLanguageCode())
     val languageCode: StateFlow<String> = _languageCodeFlow
     

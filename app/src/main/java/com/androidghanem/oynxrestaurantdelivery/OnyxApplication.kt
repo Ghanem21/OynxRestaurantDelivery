@@ -38,29 +38,22 @@ class OnyxApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         
-        // Initialize repositories
         languageRepository = LanguageRepositoryImpl(preferencesManager)
         sessionManager = SessionManager(this)
         
-        // Initialize session expiration manager
         sessionExpirationManager = SessionExpirationManager(
             application = this,
             sessionManager = sessionManager
         )
         
-        // Set up session expiration listener
         sessionExpirationManager.setSessionExpirationListener(object : SessionExpirationManager.Companion.SessionExpirationListener {
             override fun onSessionExpired() {
-                // Notify the navigation handler to navigate to the login screen
                 Log.i(TAG, "Session expired callback triggered in OnyxApplication")
                 SessionExpirationHandler.sessionExpired()
             }
         })
     }
     
-    /**
-     * Reset the inactivity timer when a user interaction is detected
-     */
     fun resetSessionTimer() {
         if (::sessionExpirationManager.isInitialized) {
             sessionExpirationManager.resetInactivityTimer()

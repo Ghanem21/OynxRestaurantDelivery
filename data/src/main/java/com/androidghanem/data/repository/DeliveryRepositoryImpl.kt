@@ -13,9 +13,6 @@ import com.androidghanem.domain.repository.DeliveryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-/**
- * Implementation of DeliveryRepository using the OnyxDeliveryService API
- */
 class DeliveryRepositoryImpl : DeliveryRepository {
     
     private val apiService: OnyxDeliveryService by lazy {

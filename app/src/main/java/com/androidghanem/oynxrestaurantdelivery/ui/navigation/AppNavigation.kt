@@ -19,7 +19,6 @@ fun AppNavigation() {
     val navController = rememberNavController()
     val splashViewModel: SplashViewModel = viewModel()
     
-    // Listen for session expiration events
     SessionExpirationEffect(navController)
 
     NavHost(navController = navController, startDestination = Screen.Splash.route) {
