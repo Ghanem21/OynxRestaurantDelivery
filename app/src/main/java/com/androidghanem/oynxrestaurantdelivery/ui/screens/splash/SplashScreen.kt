@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -19,15 +20,32 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.androidghanem.oynxrestaurantdelivery.R
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.LightBlue
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(onSplashFinished: () -> Unit) {
+fun SplashScreen(
+    onSplashFinished: () -> Unit,
+    onNavigateToHome: () -> Unit,
+    viewModel: SplashViewModel = viewModel()
+) {
+    val uiState = viewModel.uiState.collectAsState().value
+
+    LaunchedEffect(uiState.isInitialized, uiState.isSplashFinished) {
+        if (uiState.isInitialized && uiState.isSplashFinished) {
+            if (uiState.isLoggedIn) {
+                onNavigateToHome()
+            } else {
+                onSplashFinished()
+            }
+        }
+    }
+
     LaunchedEffect(key1 = true) {
         delay(3000)
-        onSplashFinished()
+        viewModel.onSplashFinished()
     }
 
     Box(

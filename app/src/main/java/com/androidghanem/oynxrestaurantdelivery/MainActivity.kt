@@ -2,6 +2,7 @@ package com.androidghanem.oynxrestaurantdelivery
 
 import android.content.Context
 import android.os.Bundle
+import android.view.MotionEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -21,10 +22,25 @@ class MainActivity : ComponentActivity() {
         val languageCode = appInstance.preferencesManager.getLanguageCode()
         super.attachBaseContext(LocaleHelper.setLocale(newBase, languageCode))
     }
+    
+    override fun onResume() {
+        super.onResume()
+        // Reset the session timer when activity resumes
+        appInstance.resetSessionTimer()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        // Set up touch event listener for the whole window to track user activity
+        window.decorView.setOnTouchListener { _, event -> 
+            if (event.action == MotionEvent.ACTION_DOWN || event.action == MotionEvent.ACTION_MOVE) {
+                appInstance.resetSessionTimer()
+            }
+            false
+        }
+        
         setContent {
             OynxRestaurantDeliveryTheme {
                 AppNavigation()

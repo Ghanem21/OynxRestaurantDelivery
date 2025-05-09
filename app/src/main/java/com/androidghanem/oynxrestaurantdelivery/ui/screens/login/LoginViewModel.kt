@@ -4,7 +4,9 @@ import android.app.Application
 import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.androidghanem.data.repository.DeliveryRepositoryImpl
 import com.androidghanem.domain.model.Language
+import com.androidghanem.domain.repository.DeliveryRepository
 import com.androidghanem.domain.repository.LanguageRepository
 import com.androidghanem.domain.utils.LocaleHelper
 import com.androidghanem.oynxrestaurantdelivery.OnyxApplication
@@ -21,7 +23,10 @@ data class LoginUiState(
     val isLanguageDialogVisible: Boolean = false,
     val isLoading: Boolean = false,
     val availableLanguages: List<Language> = emptyList(),
-    val selectedLanguage: Language? = null
+    val selectedLanguage: Language? = null,
+    val errorMessage: String? = null,
+    val isLoginSuccessful: Boolean = false,
+    val deliveryDriverName: String? = null
 )
 
 class LoginViewModel(
@@ -30,6 +35,8 @@ class LoginViewModel(
     
     private val appInstance: OnyxApplication = application as OnyxApplication
     private val languageRepository: LanguageRepository = appInstance.languageRepository
+    private val deliveryRepository: DeliveryRepository = DeliveryRepositoryImpl()
+    private val sessionManager = appInstance.sessionManager
     
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -86,12 +93,49 @@ class LoginViewModel(
     }
     
     fun login() {
-        _uiState.update { it.copy(isLoading = true) }
-        // Implement actual login logic here
-        // For demo, just simulate loading
-        viewModelScope.launch {
-            kotlinx.coroutines.delay(1000)
-            _uiState.update { it.copy(isLoading = false) }
+        val currentState = _uiState.value
+        
+        // Validate inputs
+        if (currentState.userId.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Delivery ID is required") }
+            return
         }
+        
+        if (currentState.password.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Password is required") }
+            return
+        }
+        
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+        
+        viewModelScope.launch {
+            deliveryRepository.login(
+                deliveryId = currentState.userId,
+                password = currentState.password,
+                languageCode = currentState.selectedLanguage?.code ?: "1"
+            ).onSuccess { driverInfo ->
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        isLoginSuccessful = true,
+                        errorMessage = null,
+                        deliveryDriverName = driverInfo.name
+                    )
+                }
+                // Save session data
+                sessionManager.saveSession(driverInfo)
+            }.onFailure { exception ->
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = exception.message ?: "Login failed"
+                    )
+                }
+            }
+        }
+    }
+    
+    fun clearError() {
+        _uiState.update { it.copy(errorMessage = null) }
     }
 }

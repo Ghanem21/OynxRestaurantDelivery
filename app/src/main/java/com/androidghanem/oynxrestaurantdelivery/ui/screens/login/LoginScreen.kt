@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -37,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.androidghanem.oynxrestaurantdelivery.R
+import com.androidghanem.oynxrestaurantdelivery.ui.components.AppToast
+import com.androidghanem.oynxrestaurantdelivery.ui.components.ToastType
 import com.androidghanem.oynxrestaurantdelivery.ui.screens.login.components.LanguageDialog
 import com.androidghanem.oynxrestaurantdelivery.ui.screens.login.components.LoginButton
 import com.androidghanem.oynxrestaurantdelivery.ui.screens.login.components.LoginTextField
@@ -57,6 +60,12 @@ fun LoginScreen(
     val layoutDirection = LocalLayoutDirection.current
     val isRtl = layoutDirection == LayoutDirection.Rtl
 
+    LaunchedEffect(uiState.isLoginSuccessful) {
+        if (uiState.isLoginSuccessful) {
+            onLoginSuccess()
+        }
+    }
+    
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -169,7 +178,6 @@ fun LoginScreen(
                 text = stringResource(R.string.login),
                 onClick = {
                     viewModel.login()
-                    onLoginSuccess()
                 },
                 isLoading = uiState.isLoading,
                 modifier = Modifier
@@ -203,6 +211,14 @@ fun LoginScreen(
                     viewModel.applyLanguageChange()
                 },
                 onDismiss = { viewModel.toggleLanguageDialog() }
+            )
+        }
+
+        if (uiState.errorMessage != null) {
+            AppToast(
+                message = uiState.errorMessage!!,
+                type = ToastType.ERROR,
+                onDismiss = { viewModel.clearError() }
             )
         }
     }
