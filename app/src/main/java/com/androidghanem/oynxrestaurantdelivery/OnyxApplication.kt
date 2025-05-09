@@ -4,9 +4,11 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import com.androidghanem.data.preferences.AppPreferencesManager
+import com.androidghanem.data.repository.DeliveryRepositoryImpl
 import com.androidghanem.data.repository.LanguageRepositoryImpl
 import com.androidghanem.data.session.SessionExpirationManager
 import com.androidghanem.data.session.SessionManager
+import com.androidghanem.domain.repository.DeliveryRepository
 import com.androidghanem.domain.repository.LanguageRepository
 import com.androidghanem.domain.utils.LocaleHelper
 import com.androidghanem.oynxrestaurantdelivery.ui.navigation.SessionExpirationHandler
@@ -29,6 +31,9 @@ class OnyxApplication : Application() {
     lateinit var sessionExpirationManager: SessionExpirationManager
         private set
     
+    lateinit var deliveryRepository: DeliveryRepository
+        private set
+    
     override fun attachBaseContext(base: Context) {
         preferencesManager = AppPreferencesManager(base)
         val languageCode = preferencesManager.getLanguageCode()
@@ -45,6 +50,8 @@ class OnyxApplication : Application() {
             application = this,
             sessionManager = sessionManager
         )
+        
+        deliveryRepository = DeliveryRepositoryImpl()
         
         sessionExpirationManager.setSessionExpirationListener(object : SessionExpirationManager.Companion.SessionExpirationListener {
             override fun onSessionExpired() {

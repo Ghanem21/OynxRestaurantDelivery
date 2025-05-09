@@ -17,11 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.androidghanem.oynxrestaurantdelivery.R
 import com.androidghanem.oynxrestaurantdelivery.ui.screens.home.OrderTab
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.PrimaryTeal
 
@@ -39,14 +37,14 @@ fun OrderTabs(selectedTab: OrderTab, onTabSelected: (OrderTab) -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             OrderTabItem(
-                title = stringResource(R.string.tab_new),
+                title = OrderTab.NEW.getDisplayText(),
                 isSelected = selectedTab == OrderTab.NEW,
                 onClick = { onTabSelected(OrderTab.NEW) },
                 modifier = Modifier.weight(1f)
             )
             
             OrderTabItem(
-                title = stringResource(R.string.tab_others),
+                title = OrderTab.OTHERS.getDisplayText(),
                 isSelected = selectedTab == OrderTab.OTHERS,
                 onClick = { onTabSelected(OrderTab.OTHERS) },
                 modifier = Modifier.weight(1f)

@@ -2,6 +2,9 @@ package com.androidghanem.data.network.api
 
 import com.androidghanem.data.network.model.request.*
 import com.androidghanem.data.network.model.response.BaseResponse
+import com.androidghanem.data.network.model.response.DeliveryBillResponse
+import com.androidghanem.data.network.model.response.DeliveryBillsWrapper
+import com.androidghanem.data.network.model.response.DeliveryStatusTypesWrapper
 import com.androidghanem.data.network.model.response.LoginResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -33,7 +36,7 @@ interface OnyxDeliveryService {
     @POST("OnyxDeliveryService/Service.svc/GetDeliveryBillsItems")
     suspend fun getDeliveryBillsItems(
         @Body request: BaseRequest<BillsRequest>
-    ): BaseResponse<List<Any>>
+    ): BaseResponse<DeliveryBillsWrapper>
 
     /**
      * Get delivery status types
@@ -41,7 +44,7 @@ interface OnyxDeliveryService {
     @POST("OnyxDeliveryService/Service.svc/GetDeliveryStatusTypes")
     suspend fun getDeliveryStatusTypes(
         @Body request: BaseRequest<LanguageRequest>
-    ): BaseResponse<List<Any>>
+    ): BaseResponse<DeliveryStatusTypesWrapper>
 
     /**
      * Get return bill reasons

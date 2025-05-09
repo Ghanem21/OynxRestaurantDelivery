@@ -2,8 +2,9 @@ package com.androidghanem.domain.model
 
 enum class OrderStatus {
     NEW,
-    DELIVERING,
+    DELIVERING, 
     DELIVERED,
+    PARTIAL_RETURN,
     RETURNED
 }
 

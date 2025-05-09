@@ -141,15 +141,15 @@ fun OrderItem(order: Order) {
             Column(
                 modifier = Modifier
                     .width(44.dp)
-                    .heightIn(min = 100.dp)
+                    .heightIn(min = 150.dp, max =200.dp)
                     .background(getStatusColor(order.status)),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = stringResource(id = R.string.order_details_button),
+                    text = getStatusShortName(order.status),
                     color = Color.White,
-                    fontSize = 8.sp,
+                    fontSize = 10.sp,
                     lineHeight = 12.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 4.dp)
@@ -173,6 +173,7 @@ private fun getStatusDisplayText(status: OrderStatus): String {
         OrderStatus.DELIVERING -> "Delivering"
         OrderStatus.DELIVERED -> "Delivered"
         OrderStatus.RETURNED -> "Returned"
+        OrderStatus.PARTIAL_RETURN -> "Partial Returned"
     }
 }
 
@@ -183,5 +184,17 @@ private fun getStatusColor(status: OrderStatus): Color {
         OrderStatus.DELIVERING -> PrimaryTeal
         OrderStatus.DELIVERED -> StatusGray
         OrderStatus.RETURNED -> StatusRed
+        OrderStatus.PARTIAL_RETURN -> StatusGray
+    }
+}
+
+@Composable
+private fun getStatusShortName(status: OrderStatus): String {
+    return when (status) {
+        OrderStatus.NEW -> "New"
+        OrderStatus.DELIVERING -> "In\nDelivery"
+        OrderStatus.DELIVERED -> "Delivered"
+        OrderStatus.RETURNED -> "Returned"
+        OrderStatus.PARTIAL_RETURN -> "Partial\nReturn"
     }
 }

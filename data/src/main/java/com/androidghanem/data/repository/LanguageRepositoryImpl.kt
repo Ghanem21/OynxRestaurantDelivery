@@ -16,6 +16,19 @@ class LanguageRepositoryImpl(
         Language("en", "English", "English")
     )
     
+    companion object {
+        /**
+         * Maps UI language codes to API language codes
+         * 1 for Arabic, 2 for anything else
+         */
+        fun mapLanguageCodeToApi(uiLanguageCode: String): String {
+            return when (uiLanguageCode) {
+                "ar" -> "1"
+                else -> "2"
+            }
+        }
+    }
+    
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     
     override fun getAvailableLanguages(onResult: (List<Language>) -> Unit) {

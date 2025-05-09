@@ -8,7 +8,9 @@ import com.androidghanem.data.network.model.request.ChangePasswordRequest
 import com.androidghanem.data.network.model.request.LanguageRequest
 import com.androidghanem.data.network.model.request.LoginRequest
 import com.androidghanem.data.network.model.request.UpdateBillStatusRequest
+import com.androidghanem.domain.model.DeliveryBillItem
 import com.androidghanem.domain.model.DeliveryDriverInfo
+import com.androidghanem.domain.model.DeliveryStatusType
 import com.androidghanem.domain.repository.DeliveryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,6 +21,17 @@ class DeliveryRepositoryImpl : DeliveryRepository {
         NetworkModule.provideOnyxDeliveryService()
     }
     
+    /**
+     * Maps UI language codes to API language codes
+     * 1 for Arabic, 2 for anything else
+     */
+    private fun mapLanguageCodeToApi(uiLanguageCode: String): String {
+        return when (uiLanguageCode) {
+            "ar" -> "1"
+            else -> "2"
+        }
+    }
+    
     override suspend fun login(
         deliveryId: String,
         password: String,
@@ -27,7 +40,7 @@ class DeliveryRepositoryImpl : DeliveryRepository {
         try {
             val request = BaseRequest(
                 LoginRequest(
-                    P_LANG_NO = "2",
+                    P_LANG_NO = mapLanguageCodeToApi(languageCode),
                     P_DLVRY_NO = deliveryId,
                     P_PSSWRD = password
                 )
@@ -55,7 +68,7 @@ class DeliveryRepositoryImpl : DeliveryRepository {
         try {
             val request = BaseRequest(
                 ChangePasswordRequest(
-                    P_LANG_NO = languageCode,
+                    P_LANG_NO = mapLanguageCodeToApi(languageCode),
                     P_DLVRY_NO = deliveryId,
                     P_OLD_PSSWRD = oldPassword,
                     P_NEW_PSSWRD = newPassword
@@ -79,12 +92,12 @@ class DeliveryRepositoryImpl : DeliveryRepository {
         billSerial: String,
         processedFlag: String,
         languageCode: String
-    ): Result<List<Any>> = withContext(Dispatchers.IO) {
+    ): Result<List<DeliveryBillItem>> = withContext(Dispatchers.IO) {
         try {
             val request = BaseRequest(
                 BillsRequest(
                     P_DLVRY_NO = deliveryId,
-                    P_LANG_NO = languageCode,
+                    P_LANG_NO = mapLanguageCodeToApi(languageCode),
                     P_BILL_SRL = billSerial,
                     P_PRCSSD_FLG = processedFlag
                 )
@@ -92,35 +105,54 @@ class DeliveryRepositoryImpl : DeliveryRepository {
             
             val response = apiService.getDeliveryBillsItems(request)
             
-            if (response.Result.ErrNo == 0) {
-                Result.success(response.Data ?: emptyList())
+            if (response.Result.ErrNo == 0 && response.Data != null) {
+                val billItems = mutableListOf<DeliveryBillItem>()
+                
+                for (billResponse in response.Data.DeliveryBills) {
+                    try {
+                        billItems.add(billResponse.toDomain())
+                    } catch (e: Exception) {
+                        // Skip invalid items
+                    }
+                }
+                
+                return@withContext Result.success(billItems)
             } else {
-                Result.failure(Exception(response.Result.ErrMsg))
+                val errorMessage = response.Result.ErrMsg.ifEmpty { "Unknown error occurred" }
+                return@withContext Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            return@withContext Result.failure(e)
         }
     }
     
     override suspend fun getDeliveryStatusTypes(
         languageCode: String
-    ): Result<List<Any>> = withContext(Dispatchers.IO) {
+    ): Result<List<DeliveryStatusType>> = withContext(Dispatchers.IO) {
         try {
             val request = BaseRequest(
                 LanguageRequest(
-                    P_LANG_NO = languageCode
+                    P_LANG_NO = mapLanguageCodeToApi(languageCode)
                 )
             )
             
             val response = apiService.getDeliveryStatusTypes(request)
             
-            if (response.Result.ErrNo == 0) {
-                Result.success(response.Data ?: emptyList())
+            if (response.Result.ErrNo == 0 && response.Data != null) {
+                val statusTypes = response.Data.DeliveryStatusTypes.mapNotNull {
+                    try {
+                        it.toDomain()
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+                return@withContext Result.success(statusTypes)
             } else {
-                Result.failure(Exception(response.Result.ErrMsg))
+                val errorMessage = response.Result.ErrMsg.ifEmpty { "Unknown error occurred" }
+                return@withContext Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            return@withContext Result.failure(e)
         }
     }
     
@@ -130,7 +162,7 @@ class DeliveryRepositoryImpl : DeliveryRepository {
         try {
             val request = BaseRequest(
                 LanguageRequest(
-                    P_LANG_NO = languageCode
+                    P_LANG_NO = mapLanguageCodeToApi(languageCode)
                 )
             )
             
@@ -155,7 +187,7 @@ class DeliveryRepositoryImpl : DeliveryRepository {
         try {
             val request = BaseRequest(
                 UpdateBillStatusRequest(
-                    P_LANG_NO = languageCode,
+                    P_LANG_NO = mapLanguageCodeToApi(languageCode),
                     P_BILL_SRL = billSerial,
                     P_DLVRY_STATUS_FLG = statusFlag,
                     P_DLVRY_RTRN_RSN = returnReason

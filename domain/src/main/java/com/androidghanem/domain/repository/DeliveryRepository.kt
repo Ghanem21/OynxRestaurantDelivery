@@ -1,6 +1,8 @@
 package com.androidghanem.domain.repository
 
+import com.androidghanem.domain.model.DeliveryBillItem
 import com.androidghanem.domain.model.DeliveryDriverInfo
+import com.androidghanem.domain.model.DeliveryStatusType
 
 interface DeliveryRepository {
     suspend fun login(deliveryId: String, password: String, languageCode: String = "1"): Result<DeliveryDriverInfo>
@@ -17,9 +19,9 @@ interface DeliveryRepository {
         billSerial: String = "",
         processedFlag: String = "",
         languageCode: String = "1"
-    ): Result<List<Any>>
+    ): Result<List<DeliveryBillItem>>
     
-    suspend fun getDeliveryStatusTypes(languageCode: String = "1"): Result<List<Any>>
+    suspend fun getDeliveryStatusTypes(languageCode: String = "1"): Result<List<DeliveryStatusType>>
     
     suspend fun getReturnBillReasons(languageCode: String = "1"): Result<List<Any>>
     
