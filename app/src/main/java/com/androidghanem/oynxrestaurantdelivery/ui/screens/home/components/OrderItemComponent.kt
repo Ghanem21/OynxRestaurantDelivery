@@ -3,6 +3,7 @@ package com.androidghanem.oynxrestaurantdelivery.ui.screens.home.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -48,7 +49,7 @@ fun OrderItem(order: Order) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(125.dp),
+            .height(IntrinsicSize.Max),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(modifier = Modifier.fillMaxHeight()) {
@@ -74,7 +75,7 @@ fun OrderItem(order: Order) {
                     // Order ID and Status
                     Column(
                         modifier = Modifier
-                            .weight(0.65f)
+                            .weight(1f)
                             .padding(start = 8.dp, top = 4.dp, bottom = 8.dp)
                     ) {
                         Text(
@@ -86,7 +87,7 @@ fun OrderItem(order: Order) {
 
                         Text(
                             text = getStatusDisplayText(order.status),
-                            fontSize = 16.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = getStatusColor(order.status),
                             textAlign = TextAlign.Center
@@ -119,7 +120,8 @@ fun OrderItem(order: Order) {
                             text = order.totalPrice,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            color = PrimaryTeal
                         )
                     }
 
@@ -149,7 +151,8 @@ fun OrderItem(order: Order) {
                             text = order.date,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            color = PrimaryTeal
                         )
                     }
                 }
@@ -158,13 +161,13 @@ fun OrderItem(order: Order) {
             Column(
                 modifier = Modifier
                     .fillMaxHeight(1f)
-                    .width(44.dp)
+                    .width(50.dp)
                     .background(getStatusColor(order.status)),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = getStatusShortName(order.status),
+                    text = stringResource(R.string.order_details_button),
                     color = Color.White,
                     fontSize = 10.sp,
                     lineHeight = 12.sp,
@@ -207,16 +210,5 @@ private fun getStatusColor(status: OrderStatus): Color {
         OrderStatus.DELIVERED -> StatusGray
         OrderStatus.RETURNED -> StatusRed
         OrderStatus.PARTIAL_RETURN -> StatusGray
-    }
-}
-
-@Composable
-private fun getStatusShortName(status: OrderStatus): String {
-    return when (status) {
-        OrderStatus.NEW -> stringResource(R.string.status_short_new)
-        OrderStatus.DELIVERING -> stringResource(R.string.status_short_delivering)
-        OrderStatus.DELIVERED -> stringResource(R.string.status_short_delivered)
-        OrderStatus.RETURNED -> stringResource(R.string.status_short_returned)
-        OrderStatus.PARTIAL_RETURN -> stringResource(R.string.status_short_partial_return)
     }
 }

@@ -3,7 +3,7 @@ package com.androidghanem.data.network.model.response
 import com.androidghanem.domain.model.DeliveryStatusType
 
 data class DeliveryStatusTypesWrapper(
-    val DeliveryStatusTypes: List<DeliveryStatusTypeResponse>
+    val DeliveryStatusTypes: List<DeliveryStatusTypeResponse>? = null
 )
 
 data class DeliveryStatusTypeResponse(

@@ -22,7 +22,7 @@
     <string name="label_status">Status</string>
     <string name="label_total_price">Total price</string>
     <string name="label_date">Date</string>
-    <string name="order_details_button">Order\nDetails</string>
+    <string name="order_details_button">Order Details</string>
     <!-- Order status strings -->
     <string name="status_new">New</string>
     <string name="status_delivering">Delivering</string>

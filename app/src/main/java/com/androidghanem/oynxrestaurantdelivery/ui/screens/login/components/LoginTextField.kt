@@ -11,10 +11,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.androidghanem.oynxrestaurantdelivery.ui.theme.PrimaryTeal
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.TextFieldBackground
 
 @Composable
@@ -36,7 +38,8 @@ fun LoginTextField(
                 fontSize = 14.sp,
                 text = label,
                 modifier = if (value.isEmpty() && !hasFocus.value) Modifier.fillMaxWidth() else Modifier,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = PrimaryTeal
             )
         },
         modifier = modifier
@@ -48,7 +51,10 @@ fun LoginTextField(
         trailingIcon = trailingIcon,
         colors = OutlinedTextFieldDefaults.colors(
             unfocusedContainerColor = TextFieldBackground,
-            focusedContainerColor = TextFieldBackground
+            focusedContainerColor = TextFieldBackground,
+            focusedBorderColor = PrimaryTeal,
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
         ),
         singleLine = true
     )

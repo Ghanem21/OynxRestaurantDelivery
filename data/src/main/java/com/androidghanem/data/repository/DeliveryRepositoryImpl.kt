@@ -108,11 +108,14 @@ class DeliveryRepositoryImpl : DeliveryRepository {
             if (response.Result.ErrNo == 0 && response.Data != null) {
                 val billItems = mutableListOf<DeliveryBillItem>()
                 
-                for (billResponse in response.Data.DeliveryBills) {
-                    try {
-                        billItems.add(billResponse.toDomain())
-                    } catch (e: Exception) {
-                        // Skip invalid items
+                // Handle case where DeliveryBills might be missing in the response
+                response.Data.DeliveryBills?.let { deliveryBills ->
+                    for (billResponse in deliveryBills) {
+                        try {
+                            billItems.add(billResponse.toDomain())
+                        } catch (e: Exception) {
+                            // Skip invalid items
+                        }
                     }
                 }
                 
@@ -139,13 +142,13 @@ class DeliveryRepositoryImpl : DeliveryRepository {
             val response = apiService.getDeliveryStatusTypes(request)
             
             if (response.Result.ErrNo == 0 && response.Data != null) {
-                val statusTypes = response.Data.DeliveryStatusTypes.mapNotNull {
+                val statusTypes = response.Data.DeliveryStatusTypes?.mapNotNull {
                     try {
                         it.toDomain()
                     } catch (e: Exception) {
                         null
                     }
-                }
+                } ?: emptyList()
                 return@withContext Result.success(statusTypes)
             } else {
                 val errorMessage = response.Result.ErrMsg.ifEmpty { "Unknown error occurred" }

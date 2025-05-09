@@ -3,7 +3,7 @@ package com.androidghanem.data.network.model.response
 import com.androidghanem.domain.model.DeliveryBillItem
 
 data class DeliveryBillsWrapper(
-    val DeliveryBills: List<DeliveryBillResponse>
+    val DeliveryBills: List<DeliveryBillResponse>? = null
 )
 
 data class DeliveryBillResponse(

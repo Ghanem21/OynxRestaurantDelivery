@@ -190,14 +190,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 val languageCode = getLanguageCodeForApi()
 
                 if (driverId.isNotEmpty()) {
-                    // Determine what flag to use for status filtering based on selected tab
-                    // "0" = NEW, "1" = DELIVERED, "2" = PARTIAL_RETURN, "3" = RETURNED
-                    val processedFlag = if (_orderTabState.value == OrderTab.NEW) "0" else "1,2,3"
 
                     // Call the API
                     val result = deliveryRepository.getDeliveryBills(
                         deliveryId = driverId,
-                        processedFlag = processedFlag,
                         languageCode = languageCode
                     )
 
