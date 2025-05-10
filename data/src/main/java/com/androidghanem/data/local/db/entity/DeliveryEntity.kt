@@ -10,10 +10,7 @@ data class DeliveryEntity(
     val deliveryId: String,
     val name: String
 ) {
-    fun toDomain(): DeliveryDriverInfo {
-        return DeliveryDriverInfo(deliveryId = deliveryId, name = name)
-    }
-    
+
     companion object {
         fun fromDomain(driverInfo: DeliveryDriverInfo): DeliveryEntity {
             return DeliveryEntity(

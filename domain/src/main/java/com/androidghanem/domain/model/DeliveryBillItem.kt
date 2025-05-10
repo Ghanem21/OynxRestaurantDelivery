@@ -37,7 +37,7 @@ data class DeliveryBillItem(
             } else {
                 "$formattedInt LE"
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             "$totalAmount LE"
         }
         

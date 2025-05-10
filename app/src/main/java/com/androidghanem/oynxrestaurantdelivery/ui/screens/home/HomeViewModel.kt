@@ -40,6 +40,15 @@ data class HomeUiState(
     val selectedLanguage: Language? = null
 )
 
+// Filter criteria for orders
+data class OrderFilterCriteria(
+    val datePattern: String? = null,
+    val minPrice: String? = null,
+    val maxPrice: String? = null,
+    val statusCode: Int? = null,
+    val searchQuery: String? = null,
+)
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -79,6 +88,10 @@ class HomeViewModel @Inject constructor(
     
     // Flag to check if current language is Arabic
     private val _isArabic = MutableStateFlow(false)
+
+    // Filter criteria
+    private val _filterCriteria = MutableStateFlow(OrderFilterCriteria())
+    val filterCriteria: StateFlow<OrderFilterCriteria> = _filterCriteria.asStateFlow()
 
     init {
         fetchOrders()
@@ -243,17 +256,72 @@ class HomeViewModel @Inject constructor(
                     val cachedRepo = deliveryRepository as? DeliveryRepositoryCachedImpl
                     
                     if (cachedRepo != null) {
-                        when (_orderTabState.value) {
-                            OrderTab.NEW -> {
-                                cachedRepo.getNewOrdersFromCache(driverId).collect { cachedOrders ->
+                        // Apply filters if present, otherwise use default tab filtering
+                        val criteria = _filterCriteria.value
+
+                        if (criteria.searchQuery != null) {
+                            cachedRepo.searchOrdersFromCache(driverId, criteria.searchQuery)
+                                .collect { cachedOrders ->
                                     _orders.value = cachedOrders
-                                    Log.d("HomeViewModel", "Loaded ${cachedOrders.size} orders from cache for tab NEW")
+                                    Log.d(
+                                        "HomeViewModel",
+                                        "Loaded ${cachedOrders.size} orders from cache with search query"
+                                    )
                                 }
-                            }
-                            OrderTab.OTHERS -> {
-                                cachedRepo.getProcessedOrdersFromCache(driverId).collect { cachedOrders ->
+                        } else if (criteria.datePattern != null) {
+                            cachedRepo.getOrdersByDateFromCache(driverId, criteria.datePattern)
+                                .collect { cachedOrders ->
                                     _orders.value = cachedOrders
-                                    Log.d("HomeViewModel", "Loaded ${cachedOrders.size} orders from cache for tab OTHERS")
+                                    Log.d(
+                                        "HomeViewModel",
+                                        "Loaded ${cachedOrders.size} orders from cache with date filter"
+                                    )
+                                }
+                        } else if (criteria.minPrice != null && criteria.maxPrice != null) {
+                            cachedRepo.getOrdersByPriceRangeFromCache(
+                                driverId,
+                                criteria.minPrice,
+                                criteria.maxPrice
+                            )
+                                .collect { cachedOrders ->
+                                    _orders.value = cachedOrders
+                                    Log.d(
+                                        "HomeViewModel",
+                                        "Loaded ${cachedOrders.size} orders from cache with price range filter"
+                                    )
+                                }
+                        } else if (criteria.statusCode != null) {
+                            cachedRepo.getOrdersByStatusFromCache(driverId, criteria.statusCode)
+                                .collect { cachedOrders ->
+                                    _orders.value = cachedOrders
+                                    Log.d(
+                                        "HomeViewModel",
+                                        "Loaded ${cachedOrders.size} orders from cache with status filter"
+                                    )
+                                }
+                        } else {
+                            // No filters, use default tab behavior
+                            when (_orderTabState.value) {
+                                OrderTab.NEW -> {
+                                    cachedRepo.getNewOrdersFromCache(driverId)
+                                        .collect { cachedOrders ->
+                                            _orders.value = cachedOrders
+                                            Log.d(
+                                                "HomeViewModel",
+                                                "Loaded ${cachedOrders.size} orders from cache for tab NEW"
+                                            )
+                                        }
+                                }
+
+                                OrderTab.OTHERS -> {
+                                    cachedRepo.getProcessedOrdersFromCache(driverId)
+                                        .collect { cachedOrders ->
+                                            _orders.value = cachedOrders
+                                            Log.d(
+                                                "HomeViewModel",
+                                                "Loaded ${cachedOrders.size} orders from cache for tab OTHERS"
+                                            )
+                                        }
                                 }
                             }
                         }
@@ -266,6 +334,88 @@ class HomeViewModel @Inject constructor(
                 _orders.value = emptyList()
             }
         }
+    }
+
+    /**
+     * Filter orders by date
+     */
+    fun filterByDate(datePattern: String) {
+        _filterCriteria.update {
+            it.copy(
+                datePattern = datePattern,
+                minPrice = null,
+                maxPrice = null,
+                statusCode = null,
+                searchQuery = null
+            )
+        }
+        _isLoading.value = true
+        fetchOrdersFromCache()
+        _isLoading.value = false
+    }
+
+    /**
+     * Filter orders by price range
+     */
+    fun filterByPriceRange(minPrice: String, maxPrice: String) {
+        _filterCriteria.update {
+            it.copy(
+                datePattern = null,
+                minPrice = minPrice,
+                maxPrice = maxPrice,
+                statusCode = null,
+                searchQuery = null
+            )
+        }
+        _isLoading.value = true
+        fetchOrdersFromCache()
+        _isLoading.value = false
+    }
+
+    /**
+     * Filter orders by specific status
+     */
+    fun filterByStatus(statusCode: Int) {
+        _filterCriteria.update {
+            it.copy(
+                datePattern = null,
+                minPrice = null,
+                maxPrice = null,
+                statusCode = statusCode,
+                searchQuery = null
+            )
+        }
+        _isLoading.value = true
+        fetchOrdersFromCache()
+        _isLoading.value = false
+    }
+
+    /**
+     * Search orders by query
+     */
+    fun searchOrders(query: String) {
+        _filterCriteria.update {
+            it.copy(
+                datePattern = null,
+                minPrice = null,
+                maxPrice = null,
+                statusCode = null,
+                searchQuery = query
+            )
+        }
+        _isLoading.value = true
+        fetchOrdersFromCache()
+        _isLoading.value = false
+    }
+
+    /**
+     * Clear all filters
+     */
+    fun clearFilters() {
+        _filterCriteria.value = OrderFilterCriteria()
+        _isLoading.value = true
+        fetchOrdersFromCache()
+        _isLoading.value = false
     }
 
     /**

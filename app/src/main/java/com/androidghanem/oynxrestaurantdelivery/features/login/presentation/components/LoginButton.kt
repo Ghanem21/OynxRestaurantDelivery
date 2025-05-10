@@ -1,5 +1,6 @@
 package com.androidghanem.oynxrestaurantdelivery.features.login.presentation.components
 
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -31,7 +32,7 @@ fun LoginButton(
             containerColor = PrimaryTeal,
             contentColor = Color.White
         ),
-        modifier = modifier
+        modifier = modifier.height(56.dp)
     ) {
         if (isLoading) {
             CircularProgressIndicator(

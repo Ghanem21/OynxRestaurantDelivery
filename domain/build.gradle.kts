@@ -40,9 +40,9 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    
-    implementation(libs.kotlinx.coroutines.core.v1102)
-    implementation(libs.kotlinx.coroutines.android.v1102)
+
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

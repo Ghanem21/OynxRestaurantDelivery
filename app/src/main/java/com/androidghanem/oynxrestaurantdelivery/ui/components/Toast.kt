@@ -78,7 +78,7 @@ fun AppToast(
 
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.BottomCenter
     ) {
         AnimatedVisibility(
             visible = true,

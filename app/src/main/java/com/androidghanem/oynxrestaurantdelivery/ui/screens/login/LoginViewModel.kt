@@ -1,19 +1,13 @@
 package com.androidghanem.oynxrestaurantdelivery.ui.screens.login
 
-import android.content.Context
-import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.androidghanem.data.session.SessionManager
 import com.androidghanem.domain.model.Language
 import com.androidghanem.domain.repository.DeliveryRepository
 import com.androidghanem.domain.repository.LanguageRepository
-import com.androidghanem.domain.utils.LocaleHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -43,15 +37,13 @@ enum class ErrorType {
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val languageRepository: LanguageRepository,
     private val deliveryRepository: DeliveryRepository,
     private val sessionManager: SessionManager
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(LoginUiState())
-    val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
-    
+
     init {
         loadLanguages()
     }
@@ -65,54 +57,11 @@ class LoginViewModel @Inject constructor(
             _uiState.update { it.copy(selectedLanguage = language) }
         }
     }
-    
-    fun onUserIdChange(userId: String) {
-        _uiState.update { it.copy(userId = userId) }
-    }
-    
-    fun onPasswordChange(password: String) {
-        _uiState.update { it.copy(password = password) }
-    }
 
     fun toggleLanguageDialog() {
         _uiState.update { it.copy(isLanguageDialogVisible = !it.isLanguageDialogVisible) }
     }
-    
-    fun togglePasswordVisibility() {
-        _uiState.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
-    }
-    
-    fun selectLanguage(languageCode: String) {
-        val newLanguage = _uiState.value.availableLanguages.find { it.code == languageCode }
-        newLanguage?.let {
-            _uiState.update { state -> 
-                state.copy(selectedLanguage = it) 
-            }
-        }
-    }
-    
-    fun selectAndApplyLanguage(languageCode: String) {
-        selectLanguage(languageCode)
-        applyLanguageChange()
-        toggleLanguageDialog()
-    }
 
-    fun applyLanguageChange() {
-        val selectedLanguage = _uiState.value.selectedLanguage
-        selectedLanguage?.let {
-            languageRepository.setSelectedLanguage(it.code)
-            LocaleHelper.setLocale(context, it.code)
-            context.startActivity(
-                Intent.makeRestartActivityTask(
-                    context.packageManager.getLaunchIntentForPackage(
-                        context.packageName
-                    )?.component
-                )
-            )
-        }
-        _uiState.update { it.copy(isLanguageDialogVisible = false) }
-    }
-    
     fun login() {
         val currentState = _uiState.value
         
@@ -177,8 +126,5 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
-    
-    fun clearError() {
-        _uiState.update { it.copy(errorMessage = null, errorType = ErrorType.NONE, errorMessageTitle = null) }
-    }
+
 }

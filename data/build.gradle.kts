@@ -48,11 +48,11 @@ dependencies {
     kapt(libs.hilt.compiler)
     
     // Coroutines
-    implementation(libs.kotlinx.coroutines.core.v1102)
-    implementation(libs.kotlinx.coroutines.android.v1102)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
     
     // Retrofit & OkHttp
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation(libs.retrofit)
     implementation(libs.converter.moshi)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)

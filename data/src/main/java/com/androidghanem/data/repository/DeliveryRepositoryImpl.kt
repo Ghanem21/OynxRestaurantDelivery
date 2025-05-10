@@ -7,11 +7,11 @@ import com.androidghanem.data.network.model.request.ChangePasswordRequest
 import com.androidghanem.data.network.model.request.LanguageRequest
 import com.androidghanem.data.network.model.request.LoginRequest
 import com.androidghanem.data.network.model.request.UpdateBillStatusRequest
+import com.androidghanem.domain.constants.LanguageConstants
 import com.androidghanem.domain.model.DeliveryBillItem
 import com.androidghanem.domain.model.DeliveryDriverInfo
 import com.androidghanem.domain.model.DeliveryStatusType
 import com.androidghanem.domain.repository.DeliveryRepository
-import com.androidghanem.domain.constants.LanguageConstants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -108,7 +108,7 @@ class DeliveryRepositoryImpl @Inject constructor(
                     for (billResponse in deliveryBills) {
                         try {
                             billItems.add(billResponse.toDomain())
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                             // Skip invalid items
                         }
                     }
@@ -140,7 +140,7 @@ class DeliveryRepositoryImpl @Inject constructor(
                 val statusTypes = response.Data.DeliveryStatusTypes?.mapNotNull {
                     try {
                         it.toDomain()
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         null
                     }
                 } ?: emptyList()

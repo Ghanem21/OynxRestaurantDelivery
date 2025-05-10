@@ -117,16 +117,7 @@ class DeliveryRepositoryCachedImpl @Inject constructor(
     }
     
     // New methods for accessing cached data
-    
-    /**
-     * Get all orders for a delivery from local cache
-     */
-    fun getOrdersFromCache(deliveryId: String): Flow<List<Order>> {
-        return dao.getAllOrders(deliveryId).map { entities ->
-            entities.map { it.toDomain() }
-        }
-    }
-    
+
     /**
      * Get only new orders (status = 0) for a delivery from local cache
      */
@@ -141,6 +132,50 @@ class DeliveryRepositoryCachedImpl @Inject constructor(
      */
     fun getProcessedOrdersFromCache(deliveryId: String): Flow<List<Order>> {
         return dao.getProcessedOrders(deliveryId).map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    /**
+     * Get orders filtered by date for a delivery from local cache
+     * @param datePattern Use SQL LIKE pattern (e.g. "%2023-05%")
+     */
+    fun getOrdersByDateFromCache(deliveryId: String, datePattern: String): Flow<List<Order>> {
+        return dao.getOrdersByDate(deliveryId, datePattern).map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    /**
+     * Get orders filtered by price range for a delivery from local cache
+     */
+    fun getOrdersByPriceRangeFromCache(
+        deliveryId: String,
+        minPrice: String,
+        maxPrice: String,
+    ): Flow<List<Order>> {
+        return dao.getOrdersByPriceRange(deliveryId, minPrice, maxPrice).map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    /**
+     * Get orders filtered by specific status code for a delivery from local cache
+     */
+    fun getOrdersByStatusFromCache(deliveryId: String, statusCode: Int): Flow<List<Order>> {
+        return dao.getOrdersByStatus(deliveryId, statusCode).map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    /**
+     * Search orders by query term for a delivery from local cache
+     * @param searchQuery Use SQL LIKE pattern (e.g. "%123%")
+     */
+    fun searchOrdersFromCache(deliveryId: String, searchQuery: String): Flow<List<Order>> {
+        // Format the search query for SQL LIKE
+        val formattedQuery = "%$searchQuery%"
+        return dao.searchOrders(deliveryId, formattedQuery).map { entities ->
             entities.map { it.toDomain() }
         }
     }
