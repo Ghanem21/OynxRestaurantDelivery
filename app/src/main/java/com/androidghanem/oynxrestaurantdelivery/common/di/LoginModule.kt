@@ -1,8 +1,8 @@
-package com.androidghanem.oynxrestaurantdelivery.features.login.di
+package com.androidghanem.oynxrestaurantdelivery.common.di
 
 import com.androidghanem.data.session.SessionManager
+import com.androidghanem.domain.features.login.LoginUseCase
 import com.androidghanem.domain.repository.DeliveryRepository
-import com.androidghanem.oynxrestaurantdelivery.features.login.domain.LoginUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,8 +19,8 @@ object LoginModule {
     @Provides
     @ViewModelScoped
     fun provideLoginUseCase(
-        deliveryRepository: DeliveryRepository, 
-        sessionManager: SessionManager
+        deliveryRepository: DeliveryRepository,
+        sessionManager: SessionManager,
     ): LoginUseCase {
         return LoginUseCase(deliveryRepository, sessionManager)
     }

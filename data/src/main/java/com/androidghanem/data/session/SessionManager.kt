@@ -6,11 +6,12 @@ import com.androidghanem.domain.model.DeliveryDriverInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import com.androidghanem.domain.session.SessionManager as DomainSessionManager
 
 /**
  * Manages user session data, including login status and user information
  */
-class SessionManager(context: Context) {
+class SessionManager(context: Context) : DomainSessionManager {
     
     companion object {
         private const val PREFS_NAME = "onyx_delivery_prefs"
@@ -23,10 +24,11 @@ class SessionManager(context: Context) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     
     private val _currentDriverInfo = MutableStateFlow<DeliveryDriverInfo?>(null)
-    val currentDriverInfo: StateFlow<DeliveryDriverInfo?> = _currentDriverInfo.asStateFlow()
+    override val currentDriverInfo: StateFlow<DeliveryDriverInfo?> =
+        _currentDriverInfo.asStateFlow()
     
     private val _isLoggedIn = MutableStateFlow(false)
-    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+    override val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
     
     init {
         // Load saved session data if any
@@ -53,7 +55,7 @@ class SessionManager(context: Context) {
     /**
      * Saves the delivery driver session data and marks the user as logged in
      */
-    fun saveSession(driverInfo: DeliveryDriverInfo) {
+    override fun saveSession(driverInfo: DeliveryDriverInfo) {
         sharedPreferences.edit().apply {
             putString(KEY_DRIVER_ID, driverInfo.deliveryId)
             putString(KEY_DRIVER_NAME, driverInfo.name)
@@ -68,7 +70,7 @@ class SessionManager(context: Context) {
     /**
      * Clears the session data and marks the user as logged out
      */
-    fun clearSession() {
+    override fun clearSession() {
         sharedPreferences.edit().apply {
             remove(KEY_DRIVER_ID)
             remove(KEY_DRIVER_NAME)

@@ -1,8 +1,8 @@
-package com.androidghanem.oynxrestaurantdelivery.features.login.domain
+package com.androidghanem.domain.features.login
 
-import com.androidghanem.data.session.SessionManager
 import com.androidghanem.domain.model.DeliveryDriverInfo
 import com.androidghanem.domain.repository.DeliveryRepository
+import com.androidghanem.domain.session.SessionManager
 import com.androidghanem.domain.utils.ApiResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
