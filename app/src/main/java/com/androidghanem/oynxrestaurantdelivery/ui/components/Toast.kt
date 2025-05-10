@@ -21,7 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,8 +59,8 @@ fun AppToast(
         ToastType.WARNING -> R.drawable.ic_warning
         ToastType.INFO -> R.drawable.ic_info
     }
-    
-    val fallbackIcon = remember { R.drawable.ic_launcher_foreground }
+
+    val fallbackIcon = rememberSaveable { R.drawable.ic_launcher_foreground }
     
     val displayTitle = title ?: when (type) {
         ToastType.ERROR -> "Error"
