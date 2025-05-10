@@ -51,14 +51,6 @@ interface OnyxDeliveryService {
     ): BaseResponse<DeliveryStatusTypesWrapper>
 
     /**
-     * Get return bill reasons
-     */
-    @POST("GetReturnBillReasons")
-    suspend fun getReturnBillReasons(
-        @Body request: BaseRequest<LanguageRequest>
-    ): BaseResponse<List<Any>>
-
-    /**
      * Update delivery bill status
      */
     @POST("UpdateDeliveryBillStatus")

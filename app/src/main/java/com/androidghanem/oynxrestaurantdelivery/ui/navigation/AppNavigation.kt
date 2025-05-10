@@ -8,8 +8,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.androidghanem.oynxrestaurantdelivery.features.login.presentation.LoginScreen
 import com.androidghanem.oynxrestaurantdelivery.ui.screens.home.HomeScreen
-import com.androidghanem.oynxrestaurantdelivery.ui.screens.login.LoginScreen
 import com.androidghanem.oynxrestaurantdelivery.ui.screens.splash.SplashScreen
 import com.androidghanem.oynxrestaurantdelivery.ui.screens.splash.SplashViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -56,16 +56,22 @@ fun AppNavigation() {
 
 /**
  * Effect that listens for session expiration events and navigates to login screen
+ * 
+ * Note: This effect will survive configuration changes since it's tied to the NavController's composition
  */
 @Composable
 private fun SessionExpirationEffect(navController: NavHostController) {
     val tag = "SessionExpiration"
     
-    LaunchedEffect(Unit) {
+    LaunchedEffect(navController) {
         Log.d(tag, "Starting to collect session expiration events")
-        SessionExpirationHandler.sessionExpiredEvent.collectLatest {
-            Log.i(tag, "Session expiration event collected, navigating to login")
-            SessionExpirationHandler.navigateToLogin(navController)
+        try {
+            SessionExpirationHandler.sessionExpiredEvent.collectLatest {
+                Log.i(tag, "Session expiration event collected, navigating to login")
+                SessionExpirationHandler.navigateToLogin(navController)
+            }
+        } catch (e: Exception) {
+            Log.e(tag, "Error collecting session expiration events", e)
         }
     }
 }

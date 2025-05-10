@@ -177,7 +177,7 @@ fun LanguageOption(
         ) {
             Image(
                 painter = painterResource(id = flagRes),
-                contentDescription = stringResource(R.string.flag_for, language.name),
+                contentDescription = stringResource(R.string.flag_for, language.localizedName),
                 modifier = Modifier
                     .size(24.dp)
                     .graphicsLayer {

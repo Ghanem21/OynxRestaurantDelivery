@@ -1,8 +1,6 @@
 package com.androidghanem.data.repository
 
-import android.content.Context
 import android.util.Log
-import com.androidghanem.data.local.db.DatabaseModule
 import com.androidghanem.data.local.db.dao.OnyxDeliveryDao
 import com.androidghanem.data.local.db.entity.DeliveryEntity
 import com.androidghanem.data.local.db.entity.OrderEntity
@@ -15,19 +13,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * Implementation of DeliveryRepository that adds caching capabilities using Room database
  */
-class DeliveryRepositoryCachedImpl(
-    private val context: Context,
-    private val apiRepository: DeliveryRepositoryImpl
+class DeliveryRepositoryCachedImpl @Inject constructor(
+    private val apiRepository: DeliveryRepositoryImpl,
+    private val dao: OnyxDeliveryDao
 ) : DeliveryRepository {
-    
-    private val dao: OnyxDeliveryDao by lazy {
-        DatabaseModule.provideOnyxDeliveryDao(context)
-    }
-    
+
     override suspend fun login(
         deliveryId: String,
         password: String,
@@ -109,11 +104,6 @@ class DeliveryRepositoryCachedImpl(
     override suspend fun getDeliveryStatusTypes(languageCode: String): Result<List<DeliveryStatusType>> {
         // Pass through to API repository - no caching needed
         return apiRepository.getDeliveryStatusTypes(languageCode)
-    }
-    
-    override suspend fun getReturnBillReasons(languageCode: String): Result<List<Any>> {
-        // Pass through to API repository - no caching needed
-        return apiRepository.getReturnBillReasons(languageCode)
     }
     
     override suspend fun updateDeliveryBillStatus(

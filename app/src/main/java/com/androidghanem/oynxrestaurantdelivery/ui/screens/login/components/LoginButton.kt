@@ -25,7 +25,7 @@ fun LoginButton(
         onClick = onClick,
         shape = RoundedCornerShape(64.dp),
         colors = ButtonDefaults.buttonColors(containerColor = PrimaryTeal),
-        modifier = modifier.height(50.dp)
+        modifier = modifier.height(75.dp)
     ) {
         if (isLoading) {
             CircularProgressIndicator(

@@ -1,20 +1,22 @@
 package com.androidghanem.oynxrestaurantdelivery.ui.screens.login
 
-import android.app.Application
+import android.content.Context
 import android.content.Intent
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.androidghanem.data.repository.DeliveryRepositoryImpl
+import com.androidghanem.data.session.SessionManager
 import com.androidghanem.domain.model.Language
 import com.androidghanem.domain.repository.DeliveryRepository
 import com.androidghanem.domain.repository.LanguageRepository
 import com.androidghanem.domain.utils.LocaleHelper
-import com.androidghanem.oynxrestaurantdelivery.OnyxApplication
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class LoginUiState(
     val userId: String = "",
@@ -26,17 +28,26 @@ data class LoginUiState(
     val selectedLanguage: Language? = null,
     val errorMessage: String? = null,
     val isLoginSuccessful: Boolean = false,
-    val deliveryDriverName: String? = null
+    val deliveryDriverName: String? = null,
+    val errorMessageTitle: String? = null,
+    val errorType: ErrorType = ErrorType.NONE
 )
 
-class LoginViewModel(
-    application: Application
-) : AndroidViewModel(application) {
-    
-    private val appInstance: OnyxApplication = application as OnyxApplication
-    private val languageRepository: LanguageRepository = appInstance.languageRepository
-    private val deliveryRepository: DeliveryRepository = DeliveryRepositoryImpl()
-    private val sessionManager = appInstance.sessionManager
+enum class ErrorType {
+    NONE,
+    NETWORK,
+    VALIDATION,
+    SERVER,
+    UNKNOWN
+}
+
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val languageRepository: LanguageRepository,
+    private val deliveryRepository: DeliveryRepository,
+    private val sessionManager: SessionManager
+) : ViewModel() {
     
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -67,6 +78,10 @@ class LoginViewModel(
         _uiState.update { it.copy(isLanguageDialogVisible = !it.isLanguageDialogVisible) }
     }
     
+    fun togglePasswordVisibility() {
+        _uiState.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
+    }
+    
     fun selectLanguage(languageCode: String) {
         val newLanguage = _uiState.value.availableLanguages.find { it.code == languageCode }
         newLanguage?.let {
@@ -75,16 +90,22 @@ class LoginViewModel(
             }
         }
     }
+    
+    fun selectAndApplyLanguage(languageCode: String) {
+        selectLanguage(languageCode)
+        applyLanguageChange()
+        toggleLanguageDialog()
+    }
 
     fun applyLanguageChange() {
         val selectedLanguage = _uiState.value.selectedLanguage
         selectedLanguage?.let {
             languageRepository.setSelectedLanguage(it.code)
-            LocaleHelper.setLocale(getApplication(), it.code)
-            getApplication<Application>().startActivity(
+            LocaleHelper.setLocale(context, it.code)
+            context.startActivity(
                 Intent.makeRestartActivityTask(
-                    getApplication<Application>().packageManager.getLaunchIntentForPackage(
-                        getApplication<Application>().packageName
+                    context.packageManager.getLaunchIntentForPackage(
+                        context.packageName
                     )?.component
                 )
             )
@@ -97,22 +118,30 @@ class LoginViewModel(
         
         // Validate inputs
         if (currentState.userId.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Delivery ID is required") }
+            _uiState.update { it.copy(
+                errorMessage = "Delivery ID is required",
+                errorType = ErrorType.VALIDATION,
+                errorMessageTitle = "Validation Error"
+            ) }
             return
         }
         
         if (currentState.password.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Password is required") }
+            _uiState.update { it.copy(
+                errorMessage = "Password is required",
+                errorType = ErrorType.VALIDATION,
+                errorMessageTitle = "Validation Error"
+            ) }
             return
         }
         
-        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+        _uiState.update { it.copy(isLoading = true, errorMessage = null, errorType = ErrorType.NONE) }
         
         viewModelScope.launch {
             deliveryRepository.login(
                 deliveryId = currentState.userId,
                 password = currentState.password,
-                languageCode = currentState.selectedLanguage?.code ?: "1"
+                languageCode = currentState.selectedLanguage?.code ?: "en"
             ).onSuccess { driverInfo ->
                 _uiState.update { 
                     it.copy(
@@ -125,10 +154,24 @@ class LoginViewModel(
                 // Save session data
                 sessionManager.saveSession(driverInfo)
             }.onFailure { exception ->
+                val errorType = when {
+                    exception.message?.contains("network", ignoreCase = true) == true -> ErrorType.NETWORK
+                    exception.message?.contains("server", ignoreCase = true) == true -> ErrorType.SERVER
+                    else -> ErrorType.UNKNOWN
+                }
+                
+                val errorTitle = when (errorType) {
+                    ErrorType.NETWORK -> "Network Error"
+                    ErrorType.SERVER -> "Server Error"
+                    else -> "Login Failed"
+                }
+                
                 _uiState.update { 
                     it.copy(
                         isLoading = false,
-                        errorMessage = exception.message ?: "Login failed"
+                        errorMessage = exception.message ?: "Login failed",
+                        errorType = errorType,
+                        errorMessageTitle = errorTitle
                     )
                 }
             }
@@ -136,6 +179,6 @@ class LoginViewModel(
     }
     
     fun clearError() {
-        _uiState.update { it.copy(errorMessage = null) }
+        _uiState.update { it.copy(errorMessage = null, errorType = ErrorType.NONE, errorMessageTitle = null) }
     }
 }

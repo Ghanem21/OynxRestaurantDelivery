@@ -118,11 +118,14 @@ fun OrderItem(order: Order) {
                         )
 
                         Text(
-                            text = order.totalPrice,
+                            text = formatPrice(order.totalPrice),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center,
-                            color = PrimaryTeal
+                            color = PrimaryTeal,
+                            modifier = Modifier.padding(top = 4.dp),
+                            letterSpacing = 0.5.sp,
+                            lineHeight = 20.sp
                         )
                     }
 
@@ -190,6 +193,21 @@ fun OrderItem(order: Order) {
 
         }
     }
+}
+
+@Composable
+private fun formatPrice(price: String): String {
+    // The price should already be formatted from DeliveryBillItem.toOrder()
+    // But let's enhance the display slightly for consistency
+    val spacedPrice = if (price.contains("LE")) {
+        // Make sure there's proper spacing between amount and currency
+        price.replace("LE", " LE").replace("  ", " ")
+    } else {
+        // Add currency if it's missing
+        "$price LE"
+    }
+    
+    return spacedPrice
 }
 
 @Composable

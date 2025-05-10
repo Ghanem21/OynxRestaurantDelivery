@@ -1,6 +1,5 @@
 package com.androidghanem.oynxrestaurantdelivery.ui.navigation
 
-import android.content.Context
 import android.util.Log
 import androidx.navigation.NavController
 import kotlinx.coroutines.CoroutineScope
@@ -32,11 +31,13 @@ object SessionExpirationHandler {
     
     /**
      * Navigate to login screen after session expiration
+     * Clears the back stack and navigates to login screen
      */
     fun navigateToLogin(navController: NavController) {
         Log.i(TAG, "Navigating to login screen due to session expiration")
         navController.navigate(Screen.Login.route) {
-            popUpTo(navController.graph.id) {
+            // Clear entire back stack to prevent back navigation to expired session
+            popUpTo(0) {
                 inclusive = true
             }
         }

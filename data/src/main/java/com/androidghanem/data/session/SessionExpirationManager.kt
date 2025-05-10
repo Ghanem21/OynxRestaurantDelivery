@@ -2,6 +2,7 @@ package com.androidghanem.data.session
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeUnit
  * Manages automatic session expiration after a period of inactivity
  */
 class SessionExpirationManager(
-    private val application: Application,
+    context: Context,
     private val sessionManager: SessionManager,
 ) : Application.ActivityLifecycleCallbacks {
 
@@ -40,7 +41,7 @@ class SessionExpirationManager(
     }
 
     init {
-        application.registerActivityLifecycleCallbacks(this)
+        (context.applicationContext as Application).registerActivityLifecycleCallbacks(this)
         Log.i(TAG, "SessionExpirationManager initialized with timeout of ${SESSION_TIMEOUT_DURATION / 1000} seconds")
     }
     
@@ -77,7 +78,7 @@ class SessionExpirationManager(
                         sessionExpirationListener?.onSessionExpired()
                         // Reset background time
                         lastBackgroundTime = 0
-                        isAppInForeground = inForeground
+                        isAppInForeground = true
                         return
                     }
                 }
@@ -108,6 +109,8 @@ class SessionExpirationManager(
      * Check if the session has expired based on user inactivity
      */
     private fun checkSessionExpiration() {
+        if (!isAppInForeground || !sessionManager.isLoggedIn.value) return
+        
         val currentTime = System.currentTimeMillis()
         val inactiveTime = currentTime - lastUserInteractionTime
         
@@ -126,7 +129,18 @@ class SessionExpirationManager(
 
     private fun scheduleSessionTimeout() {
         handler.removeCallbacks(sessionTimeoutRunnable)
-        handler.postDelayed(sessionTimeoutRunnable, 10000) // Check every 10 seconds
+        val currentTime = System.currentTimeMillis()
+        val inactiveTime = currentTime - lastUserInteractionTime
+        val remainingTime = SESSION_TIMEOUT_DURATION - inactiveTime
+        
+        // Schedule next check for either the remaining time or 10 seconds, whichever is smaller
+        val checkInterval = minOf(remainingTime, 10000)
+        if (checkInterval > 0) {
+            handler.postDelayed(sessionTimeoutRunnable, checkInterval)
+        } else {
+            // If no time remaining, check immediately
+            handler.post(sessionTimeoutRunnable)
+        }
     }
 
     // Application.ActivityLifecycleCallbacks implementation

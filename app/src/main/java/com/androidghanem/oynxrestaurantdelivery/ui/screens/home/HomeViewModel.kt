@@ -1,42 +1,37 @@
 package com.androidghanem.oynxrestaurantdelivery.ui.screens.home
 
-import android.app.Application
+import android.content.Context
 import android.content.Intent
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.androidghanem.data.repository.DeliveryRepositoryCachedImpl
-import com.androidghanem.data.repository.LanguageRepositoryImpl
 import com.androidghanem.domain.model.Language
 import com.androidghanem.domain.model.Order
 import com.androidghanem.domain.model.OrderStatus
 import com.androidghanem.domain.repository.DeliveryRepository
 import com.androidghanem.domain.repository.LanguageRepository
 import com.androidghanem.domain.utils.LocaleHelper
-import com.androidghanem.oynxrestaurantdelivery.OnyxApplication
 import com.androidghanem.oynxrestaurantdelivery.R
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 enum class OrderTab {
     NEW, OTHERS;
     
-    fun getDisplayText(context: android.content.Context): String {
+    fun getDisplayText(context: Context): String {
         return when (this) {
             NEW -> context.getString(R.string.tab_new)
             OTHERS -> context.getString(R.string.tab_others)
         }
     }
-    
-    fun getStringResourceId(): Int {
-        return when (this) {
-            NEW -> R.string.tab_new
-            OTHERS -> R.string.tab_others
-        }
-    }
+
 }
 
 data class HomeUiState(
@@ -45,12 +40,13 @@ data class HomeUiState(
     val selectedLanguage: Language? = null
 )
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
-    private val appInstance: OnyxApplication = application as OnyxApplication
-    private val languageRepository: LanguageRepository = appInstance.languageRepository
-    private val sessionManager = appInstance.sessionManager
-    private val deliveryRepository: DeliveryRepository = appInstance.deliveryRepository
-
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val languageRepository: LanguageRepository,
+    private val sessionManager: com.androidghanem.data.session.SessionManager, 
+    private val deliveryRepository: DeliveryRepository
+) : ViewModel() {
     // Tab state
     private val _orderTabState = MutableStateFlow(OrderTab.NEW)
     val orderTabState: StateFlow<OrderTab> = _orderTabState.asStateFlow()
@@ -65,8 +61,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     // Error state
     private val _errorState = MutableStateFlow<String?>(null)
-    val errorState: StateFlow<String?> = _errorState.asStateFlow()
-    
+
     // Offline mode flag
     private val _isOfflineMode = MutableStateFlow(false)
     val isOfflineMode: StateFlow<Boolean> = _isOfflineMode.asStateFlow()
@@ -84,7 +79,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     
     // Flag to check if current language is Arabic
     private val _isArabic = MutableStateFlow(false)
-    val isArabic: StateFlow<Boolean> = _isArabic.asStateFlow()
 
     init {
         fetchOrders()
@@ -100,7 +94,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
         languageRepository.getSelectedLanguage { language ->
             _uiState.update { it.copy(selectedLanguage = language) }
-            _isArabic.value = language?.code == "ar"
+            _isArabic.value = language.code == "ar"
         }
     }
 
@@ -152,12 +146,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val selectedLanguage = _uiState.value.selectedLanguage
         selectedLanguage?.let {
             languageRepository.setSelectedLanguage(it.code)
-            LocaleHelper.setLocale(getApplication(), it.code)
+            LocaleHelper.setLocale(context, it.code)
             _isArabic.value = it.code == "ar"
-            getApplication<Application>().startActivity(
+            context.startActivity(
                 Intent.makeRestartActivityTask(
-                    getApplication<Application>().packageManager.getLaunchIntentForPackage(
-                        getApplication<Application>().packageName
+                    context.packageManager.getLaunchIntentForPackage(
+                        context.packageName
                     )?.component
                 )
             )
@@ -171,21 +165,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             // Show loading when switching tabs
             _isLoading.value = true
             fetchOrders()
-        }
-    }
-
-    fun getTabText(tab: OrderTab): String {
-        return tab.getDisplayText(getApplication())
-    }
-
-    fun getOrderStatusText(status: OrderStatus): String {
-        val context = getApplication<Application>()
-        return when (status) {
-            OrderStatus.NEW -> context.getString(R.string.status_new)
-            OrderStatus.DELIVERING -> context.getString(R.string.status_delivering)
-            OrderStatus.DELIVERED -> context.getString(R.string.status_delivered)
-            OrderStatus.PARTIAL_RETURN -> context.getString(R.string.status_partial_return)
-            OrderStatus.RETURNED -> context.getString(R.string.status_returned)
         }
     }
 
@@ -295,6 +274,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
      */
     private fun getLanguageCodeForApi(): String {
         val selectedLanguage = _uiState.value.selectedLanguage?.code ?: "en"
-        return LanguageRepositoryImpl.mapLanguageCodeToApi(selectedLanguage)
+        return if (selectedLanguage == "ar") "1" else "2"
     }
 }

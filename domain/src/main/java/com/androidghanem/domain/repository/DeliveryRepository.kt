@@ -23,8 +23,6 @@ interface DeliveryRepository {
     
     suspend fun getDeliveryStatusTypes(languageCode: String = "1"): Result<List<DeliveryStatusType>>
     
-    suspend fun getReturnBillReasons(languageCode: String = "1"): Result<List<Any>>
-    
     suspend fun updateDeliveryBillStatus(
         billSerial: String,
         statusFlag: String,

@@ -1,6 +1,5 @@
 package com.androidghanem.oynxrestaurantdelivery.ui.screens.login
 
-import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,7 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -36,11 +34,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.androidghanem.oynxrestaurantdelivery.R
 import com.androidghanem.oynxrestaurantdelivery.ui.components.AppToast
 import com.androidghanem.oynxrestaurantdelivery.ui.components.ToastType
 import com.androidghanem.oynxrestaurantdelivery.ui.screens.login.components.LanguageDialog
+import com.androidghanem.oynxrestaurantdelivery.ui.screens.login.components.LanguageSelection
 import com.androidghanem.oynxrestaurantdelivery.ui.screens.login.components.LoginButton
 import com.androidghanem.oynxrestaurantdelivery.ui.screens.login.components.LoginTextField
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.BackgroundGray
@@ -49,11 +48,7 @@ import com.androidghanem.oynxrestaurantdelivery.ui.theme.PrimaryTeal
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit = {},
-    viewModel: LoginViewModel = viewModel(
-        factory = LoginViewModelFactory(
-            application = LocalContext.current.applicationContext as Application
-        )
-    ),
+    viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -99,28 +94,6 @@ fun LoginScreen(
             contentScale = ContentScale.FillBounds,
         )
 
-        // Language icon
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(18.dp)
-                .size(40.dp)
-                .clip(RoundedCornerShape(20.dp))
-                .clickable { viewModel.toggleLanguageDialog() }
-                .background(Color.Transparent),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_language),
-                contentDescription = "Change language",
-                modifier = Modifier
-                    .size(27.dp)
-                    .graphicsLayer {
-                        scaleX = if (isRtl) -1f else 1f
-                    }
-            )
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -162,6 +135,7 @@ fun LoginScreen(
                 modifier = Modifier.padding(top = 16.dp)
             )
 
+            // Show/Hide password toggle
             Text(
                 text = stringResource(R.string.show_more),
                 color = PrimaryTeal,
@@ -170,8 +144,8 @@ fun LoginScreen(
                 modifier = Modifier
                     .padding(16.dp)
                     .align(Alignment.End)
+                    .clickable { viewModel.togglePasswordVisibility() }
             )
-
 
             // Login button
             LoginButton(
@@ -202,6 +176,14 @@ fun LoginScreen(
             )
         }
 
+        LanguageSelection(
+            viewModel = viewModel,
+            isRtl = isRtl,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(18.dp)
+        )
+
         // Language Dialog
         if (uiState.isLanguageDialogVisible) {
             LanguageDialog(
@@ -218,8 +200,35 @@ fun LoginScreen(
             AppToast(
                 message = uiState.errorMessage!!,
                 type = ToastType.ERROR,
+                title = uiState.errorMessageTitle,
                 onDismiss = { viewModel.clearError() }
             )
         }
+    }
+}
+
+@Composable
+fun LanguageSelection(
+    viewModel: LoginViewModel,
+    isRtl: Boolean,
+    modifier: Modifier
+) {
+    Box(
+        modifier = modifier
+            .size(40.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .clickable { viewModel.toggleLanguageDialog() }
+            .background(Color.Transparent),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_language),
+            contentDescription = "Change language",
+            modifier = Modifier
+                .size(27.dp)
+                .graphicsLayer {
+                    scaleX = if (isRtl) -1f else 1f
+                }
+        )
     }
 }

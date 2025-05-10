@@ -2,24 +2,36 @@ package com.androidghanem.oynxrestaurantdelivery
 
 import android.content.Context
 import android.os.Bundle
-import android.view.MotionEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
+import com.androidghanem.data.session.SessionManager
 import com.androidghanem.domain.utils.LocaleHelper
 import com.androidghanem.oynxrestaurantdelivery.ui.navigation.AppNavigation
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.OynxRestaurantDeliveryTheme
+import com.androidghanem.oynxrestaurantdelivery.ui.util.UserActivityTracker
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private lateinit var appInstance: OnyxApplication
+    
+    private val appInstance: OnyxApplication
+        get() = applicationContext as OnyxApplication
+    
+    @Inject
+    lateinit var userActivityTracker: UserActivityTracker
+    
+    @Inject
+    lateinit var sessionManager: SessionManager
 
     override fun attachBaseContext(newBase: Context) {
-        appInstance = newBase.applicationContext as OnyxApplication
-        val languageCode = appInstance.preferencesManager.getLanguageCode()
+        val tempApp = newBase.applicationContext as OnyxApplication
+        val languageCode = tempApp.preferencesManager.getLanguageCode()
         super.attachBaseContext(LocaleHelper.setLocale(newBase, languageCode))
     }
     
@@ -28,16 +40,16 @@ class MainActivity : ComponentActivity() {
         appInstance.resetSessionTimer()
     }
 
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        userActivityTracker.onUserInteraction()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
-        window.decorView.setOnTouchListener { _, event -> 
-            if (event.action == MotionEvent.ACTION_DOWN || event.action == MotionEvent.ACTION_MOVE) {
-                appInstance.resetSessionTimer()
-            }
-            false
-        }
+        userActivityTracker.initialize(this)
         
         setContent {
             OynxRestaurantDeliveryTheme {

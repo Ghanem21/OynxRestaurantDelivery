@@ -1,6 +1,5 @@
 package com.androidghanem.oynxrestaurantdelivery.ui.screens.home
 
-import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,9 +16,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.androidghanem.oynxrestaurantdelivery.R
 import com.androidghanem.oynxrestaurantdelivery.ui.screens.home.components.EmptyOrdersState
 import com.androidghanem.oynxrestaurantdelivery.ui.screens.home.components.HomeTopBar
@@ -31,11 +29,7 @@ import com.androidghanem.oynxrestaurantdelivery.ui.theme.PrimaryTeal
 
 @Composable
 fun HomeScreen(
-    homeViewModel: HomeViewModel = viewModel(
-        factory = HomeViewModelFactory(
-            application = LocalContext.current.applicationContext as Application
-        )
-    )
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val orderTabState by homeViewModel.orderTabState.collectAsState()
     val orders by homeViewModel.orders.collectAsState()
@@ -43,8 +37,7 @@ fun HomeScreen(
     val uiState by homeViewModel.uiState.collectAsState()
     val driverName by homeViewModel.driverName.collectAsState()
     val isOfflineMode by homeViewModel.isOfflineMode.collectAsState()
-    val errorState by homeViewModel.errorState.collectAsState()
-    
+
     val snackbarHostState = remember { SnackbarHostState() }
     
     val offlineMessage = stringResource(R.string.offline_mode)

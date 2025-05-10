@@ -1,6 +1,5 @@
 package com.androidghanem.data.repository
 
-import com.androidghanem.data.network.NetworkModule
 import com.androidghanem.data.network.api.OnyxDeliveryService
 import com.androidghanem.data.network.model.request.BaseRequest
 import com.androidghanem.data.network.model.request.BillsRequest
@@ -12,26 +11,22 @@ import com.androidghanem.domain.model.DeliveryBillItem
 import com.androidghanem.domain.model.DeliveryDriverInfo
 import com.androidghanem.domain.model.DeliveryStatusType
 import com.androidghanem.domain.repository.DeliveryRepository
+import com.androidghanem.domain.constants.LanguageConstants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class DeliveryRepositoryImpl : DeliveryRepository {
-    
-    private val apiService: OnyxDeliveryService by lazy {
-        NetworkModule.provideOnyxDeliveryService()
-    }
-    
+class DeliveryRepositoryImpl @Inject constructor(
+    private val apiService: OnyxDeliveryService
+) : DeliveryRepository {
+
     /**
-     * Maps UI language codes to API language codes
-     * 1 for Arabic, 2 for anything else
+     * Maps UI language codes to API language codes using centralized constants
      */
     private fun mapLanguageCodeToApi(uiLanguageCode: String): String {
-        return when (uiLanguageCode) {
-            "ar" -> "1"
-            else -> "2"
-        }
+        return LanguageConstants.mapUiToApiLanguage(uiLanguageCode)
     }
-    
+
     override suspend fun login(
         deliveryId: String,
         password: String,
@@ -156,28 +151,6 @@ class DeliveryRepositoryImpl : DeliveryRepository {
             }
         } catch (e: Exception) {
             return@withContext Result.failure(e)
-        }
-    }
-    
-    override suspend fun getReturnBillReasons(
-        languageCode: String
-    ): Result<List<Any>> = withContext(Dispatchers.IO) {
-        try {
-            val request = BaseRequest(
-                LanguageRequest(
-                    P_LANG_NO = mapLanguageCodeToApi(languageCode)
-                )
-            )
-            
-            val response = apiService.getReturnBillReasons(request)
-            
-            if (response.Result.ErrNo == 0) {
-                Result.success(response.Data ?: emptyList())
-            } else {
-                Result.failure(Exception(response.Result.ErrMsg))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
     }
     
