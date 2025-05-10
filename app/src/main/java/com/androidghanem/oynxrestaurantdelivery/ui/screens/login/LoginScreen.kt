@@ -1,4 +1,4 @@
-package com.androidghanem.oynxrestaurantdelivery.features.login.presentation
+package com.androidghanem.oynxrestaurantdelivery.ui.screens.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,11 +32,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.androidghanem.oynxrestaurantdelivery.R
-import com.androidghanem.oynxrestaurantdelivery.features.login.presentation.components.LanguageDialog
-import com.androidghanem.oynxrestaurantdelivery.features.login.presentation.components.LanguageSelection
-import com.androidghanem.oynxrestaurantdelivery.features.login.presentation.components.LoginButton
 import com.androidghanem.oynxrestaurantdelivery.ui.components.AppToast
 import com.androidghanem.oynxrestaurantdelivery.ui.components.ToastType
+import com.androidghanem.oynxrestaurantdelivery.ui.screens.login.components.LanguageDialog
+import com.androidghanem.oynxrestaurantdelivery.ui.screens.login.components.LanguageSelection
+import com.androidghanem.oynxrestaurantdelivery.ui.screens.login.components.LoginButton
 import com.androidghanem.oynxrestaurantdelivery.ui.screens.login.components.LoginTextField
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.BackgroundGray
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.PrimaryTeal
@@ -95,7 +95,7 @@ fun LoginScreen(
             isRtl = isRtl,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(18.dp)
+                .padding(16.dp)
         )
 
         // Main content column

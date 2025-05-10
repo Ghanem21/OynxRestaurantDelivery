@@ -51,22 +51,25 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    
+
     // Navigation
     implementation(libs.androidx.navigation.compose)
-    
+
+    // Lifecycle
+    implementation("androidx.lifecycle:lifecycle-process:${libs.versions.lifecycleRuntimeKtx.get()}")
+
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    
+
     // Module dependencies
     implementation(project(":domain"))
     implementation(project(":data"))
-    
+
     // Dagger Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
-    
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

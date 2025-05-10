@@ -2,6 +2,7 @@ package com.androidghanem.oynxrestaurantdelivery
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -37,7 +38,15 @@ class MainActivity : ComponentActivity() {
     
     override fun onResume() {
         super.onResume()
-        appInstance.resetSessionTimer()
+        if (sessionManager.isLoggedIn.value) {
+            Log.d("SessionExpiration", "Resetting session timer on activity resume")
+            appInstance.resetSessionTimer()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("SessionExpiration", "Activity stopped, app going to background")
     }
 
     override fun onUserInteraction() {
@@ -64,5 +73,8 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        Log.d("SessionExpiration", "Starting session monitoring")
+        appInstance.resetSessionTimer()
     }
 }

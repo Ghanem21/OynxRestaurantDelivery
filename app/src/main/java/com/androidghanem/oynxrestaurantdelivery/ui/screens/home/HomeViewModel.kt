@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 enum class OrderTab {
     NEW, OTHERS;
-    
+
     fun getDisplayText(context: Context): String {
         return when (this) {
             NEW -> context.getString(R.string.tab_new)
@@ -37,24 +37,15 @@ enum class OrderTab {
 data class HomeUiState(
     val isLanguageDialogVisible: Boolean = false,
     val availableLanguages: List<Language> = emptyList(),
-    val selectedLanguage: Language? = null
-)
-
-// Filter criteria for orders
-data class OrderFilterCriteria(
-    val datePattern: String? = null,
-    val minPrice: String? = null,
-    val maxPrice: String? = null,
-    val statusCode: Int? = null,
-    val searchQuery: String? = null,
+    val selectedLanguage: Language? = null,
 )
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val languageRepository: LanguageRepository,
-    private val sessionManager: com.androidghanem.data.session.SessionManager, 
-    private val deliveryRepository: DeliveryRepository
+    private val sessionManager: com.androidghanem.data.session.SessionManager,
+    private val deliveryRepository: DeliveryRepository,
 ) : ViewModel() {
     // Tab state
     private val _orderTabState = MutableStateFlow(OrderTab.NEW)
@@ -85,19 +76,11 @@ class HomeViewModel @Inject constructor(
 
     // Driver ID for API calls
     private var driverId: String = ""
-    
-    // Flag to check if current language is Arabic
-    private val _isArabic = MutableStateFlow(false)
-
-    // Filter criteria
-    private val _filterCriteria = MutableStateFlow(OrderFilterCriteria())
-    val filterCriteria: StateFlow<OrderFilterCriteria> = _filterCriteria.asStateFlow()
 
     init {
         fetchOrders()
         loadLanguages()
         loadDriverInfo()
-        loadStatusTypes()
     }
 
     private fun loadLanguages() {
@@ -107,7 +90,6 @@ class HomeViewModel @Inject constructor(
 
         languageRepository.getSelectedLanguage { language ->
             _uiState.update { it.copy(selectedLanguage = language) }
-            _isArabic.value = language.code == "ar"
         }
     }
 
@@ -119,25 +101,6 @@ class HomeViewModel @Inject constructor(
                 if (driverId.isNotEmpty()) {
                     fetchOrders()
                 }
-            }
-        }
-    }
-
-    private fun loadStatusTypes() {
-        viewModelScope.launch {
-            try {
-                val languageCode = getLanguageCodeForApi()
-                deliveryRepository.getDeliveryStatusTypes(languageCode).fold(
-                    onSuccess = { statusTypes ->
-                        // Log status types for debugging
-                        Log.d("HomeViewModel", "Status Types: $statusTypes")
-                    },
-                    onFailure = { error ->
-                        Log.e("HomeViewModel", "Error loading status types: ${error.message}")
-                    }
-                )
-            } catch (e: Exception) {
-                Log.e("HomeViewModel", "Exception loading status types", e)
             }
         }
     }
@@ -160,7 +123,6 @@ class HomeViewModel @Inject constructor(
         selectedLanguage?.let {
             languageRepository.setSelectedLanguage(it.code)
             LocaleHelper.setLocale(context, it.code)
-            _isArabic.value = it.code == "ar"
             context.startActivity(
                 Intent.makeRestartActivityTask(
                     context.packageManager.getLaunchIntentForPackage(
@@ -205,19 +167,25 @@ class HomeViewModel @Inject constructor(
                         onSuccess = { bills ->
                             // Map API responses to Order objects
                             val ordersList = bills.map { it.toOrder() }
-                            
+
                             // Apply additional filtering in case the API doesn't filter properly
                             val filteredOrders = when (_orderTabState.value) {
                                 OrderTab.NEW -> ordersList.filter { it.status == OrderStatus.NEW }
                                 OrderTab.OTHERS -> ordersList.filter { it.status != OrderStatus.NEW }
                             }
-                            
+
                             _orders.value = filteredOrders
-                            
+
                             if (_orders.value.isEmpty()) {
-                                Log.d("HomeViewModel", "No orders found for selected tab: ${_orderTabState.value}")
+                                Log.d(
+                                    "HomeViewModel",
+                                    "No orders found for selected tab: ${_orderTabState.value}"
+                                )
                             } else {
-                                Log.d("HomeViewModel", "Loaded ${_orders.value.size} orders for tab: ${_orderTabState.value}")
+                                Log.d(
+                                    "HomeViewModel",
+                                    "Loaded ${_orders.value.size} orders for tab: ${_orderTabState.value}"
+                                )
                             }
                         },
                         onFailure = { error ->
@@ -244,7 +212,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-    
+
     /**
      * Fetches orders from the local database cache
      */
@@ -254,168 +222,43 @@ class HomeViewModel @Inject constructor(
                 if (driverId.isNotEmpty()) {
                     // Cast to cached implementation to access cache methods
                     val cachedRepo = deliveryRepository as? DeliveryRepositoryCachedImpl
-                    
+
                     if (cachedRepo != null) {
                         // Apply filters if present, otherwise use default tab filtering
-                        val criteria = _filterCriteria.value
 
-                        if (criteria.searchQuery != null) {
-                            cachedRepo.searchOrdersFromCache(driverId, criteria.searchQuery)
-                                .collect { cachedOrders ->
-                                    _orders.value = cachedOrders
-                                    Log.d(
-                                        "HomeViewModel",
-                                        "Loaded ${cachedOrders.size} orders from cache with search query"
-                                    )
-                                }
-                        } else if (criteria.datePattern != null) {
-                            cachedRepo.getOrdersByDateFromCache(driverId, criteria.datePattern)
-                                .collect { cachedOrders ->
-                                    _orders.value = cachedOrders
-                                    Log.d(
-                                        "HomeViewModel",
-                                        "Loaded ${cachedOrders.size} orders from cache with date filter"
-                                    )
-                                }
-                        } else if (criteria.minPrice != null && criteria.maxPrice != null) {
-                            cachedRepo.getOrdersByPriceRangeFromCache(
-                                driverId,
-                                criteria.minPrice,
-                                criteria.maxPrice
-                            )
-                                .collect { cachedOrders ->
-                                    _orders.value = cachedOrders
-                                    Log.d(
-                                        "HomeViewModel",
-                                        "Loaded ${cachedOrders.size} orders from cache with price range filter"
-                                    )
-                                }
-                        } else if (criteria.statusCode != null) {
-                            cachedRepo.getOrdersByStatusFromCache(driverId, criteria.statusCode)
-                                .collect { cachedOrders ->
-                                    _orders.value = cachedOrders
-                                    Log.d(
-                                        "HomeViewModel",
-                                        "Loaded ${cachedOrders.size} orders from cache with status filter"
-                                    )
-                                }
-                        } else {
-                            // No filters, use default tab behavior
-                            when (_orderTabState.value) {
-                                OrderTab.NEW -> {
-                                    cachedRepo.getNewOrdersFromCache(driverId)
-                                        .collect { cachedOrders ->
-                                            _orders.value = cachedOrders
-                                            Log.d(
-                                                "HomeViewModel",
-                                                "Loaded ${cachedOrders.size} orders from cache for tab NEW"
-                                            )
-                                        }
-                                }
+                        // No filters, use default tab behavior
+                        when (_orderTabState.value) {
+                            OrderTab.NEW -> {
+                                cachedRepo.getNewOrdersFromCache(driverId)
+                                    .collect { cachedOrders ->
+                                        _orders.value = cachedOrders
+                                        Log.d(
+                                            "HomeViewModel",
+                                            "Loaded ${cachedOrders.size} orders from cache for tab NEW"
+                                        )
+                                    }
+                            }
 
-                                OrderTab.OTHERS -> {
-                                    cachedRepo.getProcessedOrdersFromCache(driverId)
-                                        .collect { cachedOrders ->
-                                            _orders.value = cachedOrders
-                                            Log.d(
-                                                "HomeViewModel",
-                                                "Loaded ${cachedOrders.size} orders from cache for tab OTHERS"
-                                            )
-                                        }
-                                }
+                            OrderTab.OTHERS -> {
+                                cachedRepo.getProcessedOrdersFromCache(driverId)
+                                    .collect { cachedOrders ->
+                                        _orders.value = cachedOrders
+                                        Log.d(
+                                            "HomeViewModel",
+                                            "Loaded ${cachedOrders.size} orders from cache for tab OTHERS"
+                                        )
+                                    }
                             }
                         }
-                    } else {
-                        Log.e("HomeViewModel", "Repository is not a cached implementation")
                     }
+                } else {
+                    Log.e("HomeViewModel", "Repository is not a cached implementation")
                 }
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "Error loading from cache", e)
                 _orders.value = emptyList()
             }
         }
-    }
-
-    /**
-     * Filter orders by date
-     */
-    fun filterByDate(datePattern: String) {
-        _filterCriteria.update {
-            it.copy(
-                datePattern = datePattern,
-                minPrice = null,
-                maxPrice = null,
-                statusCode = null,
-                searchQuery = null
-            )
-        }
-        _isLoading.value = true
-        fetchOrdersFromCache()
-        _isLoading.value = false
-    }
-
-    /**
-     * Filter orders by price range
-     */
-    fun filterByPriceRange(minPrice: String, maxPrice: String) {
-        _filterCriteria.update {
-            it.copy(
-                datePattern = null,
-                minPrice = minPrice,
-                maxPrice = maxPrice,
-                statusCode = null,
-                searchQuery = null
-            )
-        }
-        _isLoading.value = true
-        fetchOrdersFromCache()
-        _isLoading.value = false
-    }
-
-    /**
-     * Filter orders by specific status
-     */
-    fun filterByStatus(statusCode: Int) {
-        _filterCriteria.update {
-            it.copy(
-                datePattern = null,
-                minPrice = null,
-                maxPrice = null,
-                statusCode = statusCode,
-                searchQuery = null
-            )
-        }
-        _isLoading.value = true
-        fetchOrdersFromCache()
-        _isLoading.value = false
-    }
-
-    /**
-     * Search orders by query
-     */
-    fun searchOrders(query: String) {
-        _filterCriteria.update {
-            it.copy(
-                datePattern = null,
-                minPrice = null,
-                maxPrice = null,
-                statusCode = null,
-                searchQuery = query
-            )
-        }
-        _isLoading.value = true
-        fetchOrdersFromCache()
-        _isLoading.value = false
-    }
-
-    /**
-     * Clear all filters
-     */
-    fun clearFilters() {
-        _filterCriteria.value = OrderFilterCriteria()
-        _isLoading.value = true
-        fetchOrdersFromCache()
-        _isLoading.value = false
     }
 
     /**

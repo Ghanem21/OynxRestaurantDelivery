@@ -10,17 +10,17 @@ class LanguageRepositoryImpl @Inject constructor(
 ) : LanguageRepository {
 
     override fun getAvailableLanguages(callback: (List<Language>) -> Unit) {
-        // We could load this from a remote API in a real app
+        val currentCode = preferencesManager.getLanguageCode().lowercase()
         val languages = listOf(
-            Language("ar", "العربية"),
-            Language("en", "English")
+            Language("ar", "العربية", isSelected = currentCode == "ar"),
+            Language("en", "English", isSelected = currentCode == "en")
         )
         callback(languages)
     }
 
     override fun getSelectedLanguage(callback: (Language) -> Unit) {
         val code = preferencesManager.getLanguageCode()
-        val language = when (code) {
+        val language = when (code.lowercase()) {
             "ar" -> Language("ar", "العربية")
             else -> Language("en", "English")
         }

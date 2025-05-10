@@ -29,7 +29,7 @@ data class DeliveryBillResponse(
     fun toDomain(): DeliveryBillItem {
         val totalAmount = try {
             BILL_AMT.toDouble()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             0.0
         }
         
