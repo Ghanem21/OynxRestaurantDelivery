@@ -20,6 +20,20 @@ This project follows Clean Architecture principles and is structured into three 
 
 For more details about the architecture, see [README_ARCHITECTURE.md](./README_ARCHITECTURE.md).
 
+## Design Patterns
+
+The application implements several design patterns to ensure maintainable, testable, and scalable
+code:
+
+- **MVVM (Model-View-ViewModel)**: Separates UI from business logic and facilitates testing
+- **Repository Pattern**: Abstracts data sources and provides a clean API to the domain layer
+- **Factory Pattern**: Used for creating repository instances and other components
+- **Observer Pattern**: Implemented via Kotlin Flow for reactive data streams
+- **Dependency Injection**: Using Hilt to manage dependencies across the application
+- **Use Case Pattern**: Encapsulates business logic in single-responsibility classes
+- **Builder Pattern**: Used for constructing complex objects
+- **Adapter Pattern**: Used for converting between data models in different layers
+
 ## Technology Stack
 
 - **UI**: Jetpack Compose
