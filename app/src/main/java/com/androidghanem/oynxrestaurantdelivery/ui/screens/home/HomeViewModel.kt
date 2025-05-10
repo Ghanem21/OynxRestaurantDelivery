@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.androidghanem.data.repository.DeliveryRepositoryCachedImpl
 import com.androidghanem.data.repository.LanguageRepositoryImpl
 import com.androidghanem.domain.model.Language
 import com.androidghanem.domain.model.Order
@@ -61,6 +62,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     // Loading state
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    // Error state
+    private val _errorState = MutableStateFlow<String?>(null)
+    val errorState: StateFlow<String?> = _errorState.asStateFlow()
+    
+    // Offline mode flag
+    private val _isOfflineMode = MutableStateFlow(false)
+    val isOfflineMode: StateFlow<Boolean> = _isOfflineMode.asStateFlow()
 
     // UI state for language dialog
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -185,6 +194,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 // Show loading
                 _isLoading.value = true
+                // Reset error state and offline mode
+                _errorState.value = null
+                _isOfflineMode.value = false
 
                 // Get the language code for API
                 val languageCode = getLanguageCodeForApi()
@@ -217,7 +229,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                             }
                         },
                         onFailure = { error ->
-                            _orders.value = emptyList()
+                            // When API fails, load from cache
+                            fetchOrdersFromCache()
+                            _errorState.value = error.message
+                            _isOfflineMode.value = true
                             Log.e("HomeViewModel", "Error loading orders: ${error.message}", error)
                         }
                     )
@@ -227,11 +242,49 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     Log.w("HomeViewModel", "No driver ID available")
                 }
             } catch (e: Exception) {
-                // Handle any potential exception
-                _orders.value = emptyList()
+                // Handle any potential exception by loading from cache
+                fetchOrdersFromCache()
+                _errorState.value = e.message
+                _isOfflineMode.value = true
                 Log.e("HomeViewModel", "Exception while loading orders", e)
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+    
+    /**
+     * Fetches orders from the local database cache
+     */
+    private fun fetchOrdersFromCache() {
+        viewModelScope.launch {
+            try {
+                if (driverId.isNotEmpty()) {
+                    // Cast to cached implementation to access cache methods
+                    val cachedRepo = deliveryRepository as? DeliveryRepositoryCachedImpl
+                    
+                    if (cachedRepo != null) {
+                        when (_orderTabState.value) {
+                            OrderTab.NEW -> {
+                                cachedRepo.getNewOrdersFromCache(driverId).collect { cachedOrders ->
+                                    _orders.value = cachedOrders
+                                    Log.d("HomeViewModel", "Loaded ${cachedOrders.size} orders from cache for tab NEW")
+                                }
+                            }
+                            OrderTab.OTHERS -> {
+                                cachedRepo.getProcessedOrdersFromCache(driverId).collect { cachedOrders ->
+                                    _orders.value = cachedOrders
+                                    Log.d("HomeViewModel", "Loaded ${cachedOrders.size} orders from cache for tab OTHERS")
+                                }
+                            }
+                        }
+                    } else {
+                        Log.e("HomeViewModel", "Repository is not a cached implementation")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error loading from cache", e)
+                _orders.value = emptyList()
             }
         }
     }

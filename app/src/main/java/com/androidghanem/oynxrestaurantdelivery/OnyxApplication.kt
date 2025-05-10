@@ -3,7 +3,9 @@ package com.androidghanem.oynxrestaurantdelivery
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import com.androidghanem.data.local.db.DatabaseModule
 import com.androidghanem.data.preferences.AppPreferencesManager
+import com.androidghanem.data.repository.DeliveryRepositoryCachedImpl
 import com.androidghanem.data.repository.DeliveryRepositoryImpl
 import com.androidghanem.data.repository.LanguageRepositoryImpl
 import com.androidghanem.data.session.SessionExpirationManager
@@ -51,7 +53,8 @@ class OnyxApplication : Application() {
             sessionManager = sessionManager
         )
         
-        deliveryRepository = DeliveryRepositoryImpl()
+        val apiRepository = DeliveryRepositoryImpl()
+        deliveryRepository = DeliveryRepositoryCachedImpl(this, apiRepository)
         
         sessionExpirationManager.setSessionExpirationListener(object : SessionExpirationManager.Companion.SessionExpirationListener {
             override fun onSessionExpired() {

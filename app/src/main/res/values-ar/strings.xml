@@ -35,4 +35,5 @@
     <string name="status_short_delivered">تم\nالتوصيل</string>
     <string name="status_short_partial_return">إرجاع\nجزئي</string>
     <string name="status_short_returned">تم\nالإرجاع</string>
+    <string name="offline_mode">وضع غير متصل: استخدام البيانات المخزنة</string>
 </resources>

@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
  */
 object NetworkModule {
     
-    private const val BASE_URL = "https://mdev.yemensoft.net:473/"
+    private const val BASE_URL = "https://mdev.yemensoft.net:473/OnyxDeliveryService/Service.svc/"
     
     /**
      * Creates an OkHttpClient with logging

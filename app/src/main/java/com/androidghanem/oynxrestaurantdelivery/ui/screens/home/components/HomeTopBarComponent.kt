@@ -36,6 +36,7 @@ import com.androidghanem.oynxrestaurantdelivery.ui.theme.PrimaryTeal
 fun HomeTopBar(
     name: String,
     onLanguageClick: () -> Unit = {},
+    isOfflineMode: Boolean = false
 ) {
 
     val layoutDirection = LocalLayoutDirection.current
@@ -75,6 +76,17 @@ fun HomeTopBar(
                     fontSize = 26.sp,
                     fontWeight = FontWeight.ExtraBold
                 )
+                
+                // Offline mode indicator
+                if (isOfflineMode) {
+                    Text(
+                        text = "OFFLINE MODE",
+                        color = Color.Yellow,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
             }
 
             Image(
@@ -134,4 +146,10 @@ fun HomeTopBar(
 @Composable
 fun HomeTopBarPreview() {
     HomeTopBar(name = "John Doe")
+}
+
+@Preview
+@Composable
+fun HomeTopBarOfflinePreview() {
+    HomeTopBar(name = "John Doe", isOfflineMode = true)
 }

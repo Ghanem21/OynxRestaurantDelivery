@@ -17,5 +17,6 @@ val TextFieldBackground = Color(0xFFF1F5FB)
 
 val HeaderRed = Color(0xFFE53935)
 val StatusGreen = Color(0xFF4CAF50)
+val StatusYellow = Color(0xFFF9A825)
 val StatusGray = Color(0xFF9E9E9E)
 val StatusRed = Color(0xFFE53935)

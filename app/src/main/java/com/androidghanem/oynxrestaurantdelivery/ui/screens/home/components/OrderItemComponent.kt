@@ -39,6 +39,7 @@ import com.androidghanem.oynxrestaurantdelivery.ui.theme.PrimaryTeal
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.StatusGray
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.StatusGreen
 import com.androidghanem.oynxrestaurantdelivery.ui.theme.StatusRed
+import com.androidghanem.oynxrestaurantdelivery.ui.theme.StatusYellow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,7 +91,7 @@ fun OrderItem(order: Order) {
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = getStatusColor(order.status),
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Start
                         )
                     }
 
@@ -209,6 +210,6 @@ private fun getStatusColor(status: OrderStatus): Color {
         OrderStatus.DELIVERING -> PrimaryTeal
         OrderStatus.DELIVERED -> StatusGray
         OrderStatus.RETURNED -> StatusRed
-        OrderStatus.PARTIAL_RETURN -> StatusGray
+        OrderStatus.PARTIAL_RETURN -> StatusYellow
     }
 }

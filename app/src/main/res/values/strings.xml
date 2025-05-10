@@ -35,4 +35,5 @@
     <string name="status_short_delivered">Delivered</string>
     <string name="status_short_partial_return">Partial\nReturn</string>
     <string name="status_short_returned">Returned</string>
+    <string name="offline_mode">Offline Mode: Using Cached Data</string>
 </resources>
